@@ -13,7 +13,7 @@
 
 
 // Function to save the Config struct back into a YAML file
-void save_config(const std::string &filename, const Config &cfg)
+void ConfigHelper::save_config(const std::string &filename, const Config &cfg)
 {
     YAML::Emitter out;
     out << YAML::BeginMap;
@@ -32,7 +32,7 @@ void save_config(const std::string &filename, const Config &cfg)
 }
 
 // Function to load the YAML config file into a Config struct
-Config load_config(const std::string &filename)
+Config ConfigHelper::load_config(const std::string &filename)
 {
     YAML::Node config = YAML::LoadFile(filename);
     Config cfg;

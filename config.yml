@@ -1,9 +1,5 @@
-General:
-  AppName: MyApp
-  Version: 1
+general:
+  app_name: Toolbox
+  version: 1
 
-Network:
-  Host: 127.0.0.1
-  Port: 8080
-
-Global Hotkeys:
+hotkeys:

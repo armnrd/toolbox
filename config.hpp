@@ -13,15 +13,30 @@
 
 
 // Structure to hold the configuration data
-struct Config {
+struct Config
+{
     std::string app_name;
     int version;
     std::string host;
     int port;
+
 };
 
-Config load_config(const std::string& filename);
+enum struct ConfigEnum
+{
+    HOTKEYS_CLOSE
+};
 
-void save_config(const std::string& filename, const Config& cfg);
+class ConfigHelper
+{
+public:
+    static Config load_config(const std::string& filename);
+
+    static void save_config(const std::string& filename, const Config& cfg);
+
+private:
+    static ConfigEnum string_to_enum(std::string string);
+};
+
 
 #endif //TOOLBOX_CONFIG_HPP
