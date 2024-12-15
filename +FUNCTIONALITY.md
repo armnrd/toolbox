@@ -1,9 +1,9 @@
 # Primary
 
+- [ ] window management: minimize, maximize, resize, edge-move, bottom-screen
 - firefox app hotkeys: focus to tab in running Firefox using marionette
 - https://stackoverflow.com/questions/1820825/global-hotkey-with-win32-api
 - [ ] script hotkeys: stop memory hogs, start memory hogs
-- [ ] window management: minimize, maximize, resize, edge-move, bottom-screen
 - [ ] show system metrics as desktop underlay
 - [ ] set daily agenda tasks S1 S2 S3
 - [ ] show Todoist tasks as desktop underlay

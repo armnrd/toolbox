@@ -10,22 +10,10 @@
 #define TOOLBOX_CONFIG_HPP
 
 #include <string>
+#include <yaml-cpp/yaml.h>
 
 
-// Structure to hold the configuration data
-struct Config
-{
-    std::string app_name;
-    int version;
-    std::string host;
-    int port;
-
-};
-
-enum struct ConfigEnum
-{
-    HOTKEYS_CLOSE
-};
+typedef YAML::Node Config;
 
 class ConfigHelper
 {
@@ -33,9 +21,6 @@ public:
     static Config load_config(const std::string& filename);
 
     static void save_config(const std::string& filename, const Config& cfg);
-
-private:
-    static ConfigEnum string_to_enum(std::string string);
 };
 
 

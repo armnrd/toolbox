@@ -39,7 +39,7 @@ bool HotkeyNativeEventFilter::nativeEventFilter(const QByteArray &eventType, voi
         MSG *msg = static_cast<MSG *>(message);
         if (msg->message == WM_HOTKEY) {
             if (msg->wParam == 1) {  // ID of the hotkey we registered
-                QMessageBox::information(nullptr, "Hotkey Pressed", "ALT + A was pressed!");
+//                QMessageBox::information(nullptr, "Hotkey Pressed", "ALT + A was pressed!");
                 return true;
             }
         }

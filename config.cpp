@@ -7,38 +7,27 @@
  */
 
 #include "config.hpp"
-#include <iostream>
 #include <fstream>
+#include <format>
+#include <QDebug>
 #include <yaml-cpp/yaml.h>
 
 
 // Function to save the Config struct back into a YAML file
 void ConfigHelper::save_config(const std::string &filename, const Config &cfg)
 {
-    YAML::Emitter out;
-    out << YAML::BeginMap;
-    out << YAML::Key << "General" << YAML::Value << YAML::BeginMap;
-    out << YAML::Key << "AppName" << YAML::Value << cfg.app_name;
-    out << YAML::Key << "Version" << YAML::Value << cfg.version;
-    out << YAML::EndMap;
-    out << YAML::Key << "Network" << YAML::Value << YAML::BeginMap;
-    out << YAML::Key << "Host" << YAML::Value << cfg.host;
-    out << YAML::Key << "Port" << YAML::Value << cfg.port;
-    out << YAML::EndMap;
-    out << YAML::EndMap;
-
     std::ofstream fout(filename);
-    fout << out.c_str();
+    if (fout.is_open()) {
+        fout << cfg;
+        fout.close();
+        qDebug() << std::format("YAML config written to {}.", filename);
+    } else {
+        qDebug() << std::format("Failed to open {} for writing YAML config to.", filename);
+    }
 }
 
 // Function to load the YAML config file into a Config struct
 Config ConfigHelper::load_config(const std::string &filename)
 {
-    YAML::Node config = YAML::LoadFile(filename);
-    Config cfg;
-    cfg.app_name = config["General"]["AppName"].as<std::string>();
-    cfg.version = config["General"]["Version"].as<int>();
-    cfg.host = config["Network"]["Host"].as<std::string>();
-    cfg.port = config["Network"]["Port"].as<int>();
-    return cfg;
+    return YAML::LoadFile(filename);
 }

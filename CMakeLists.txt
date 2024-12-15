@@ -53,7 +53,7 @@ target_link_libraries(toolbox
 # Copy configuration, etc. files to the build directory after building the target
 add_custom_command(
         TARGET toolbox POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/config.yml $<TARGET_FILE_DIR:toolbox>
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/config.yml $<TARGET_FILE_DIR:toolbox>
         #        COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/sounds $<TARGET_FILE_DIR:toolbox>/sounds
 )
 
