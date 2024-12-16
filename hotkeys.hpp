@@ -9,25 +9,37 @@
 #ifndef TOOLBOX_HOTKEYS_HPP
 #define TOOLBOX_HOTKEYS_HPP
 
-struct Hotkey {
-    int id;                 // Unique identifier for the hotkey
-    int key;                // Virtual key code (e.g., 0x41 for 'A')
-    unsigned int modifiers; // Modifier keys (e.g., MOD_ALT | MOD_CONTROL)
-};
+namespace hotkeys
+{
+    class KeymapEventFilter : public QObject, public QAbstractNativeEventFilter {
+    public:
+        KeymapEventFilter(QObject* parent, std::map<std::string, std::function<void()> *> *keymap);
 
-class HotkeyNativeEventFilter : public QObject, public QAbstractNativeEventFilter {
-public:
-    HotkeyNativeEventFilter(QObject* parent, std::map<Hotkey, std::function<void()>> *keymap);
+        ~KeymapEventFilter();
 
-    ~HotkeyNativeEventFilter();
+        // Override native event filter to capture the WM_HOTKEY message
+        bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override;
 
-    // Override native event filter to capture the WM_HOTKEY message
-    bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override;
+    private:
+        // (key combination, (function, hotkey id)
+        std::map<std::string, std::function<void()> *> *keymap;
+        std::map<unsigned int, std::function<void()> *> *id_map;
+        unsigned int keycode_from_combination(std::string);
+        unsigned int modifiers_from_combination(std::string);
+    };
+    
+    /**
+     * @brief Registers a keymap.
+     *
+     * @param app - reference to main application
+     * @param keymap - keymap to register with the event filter
+     * @return the NativeEventFilter object generated from the keymap; for use later if the keymap needs changing
+     * @note placeholder
+     */
+    KeymapEventFilter *install_keymap(QApplication *app, std::map<std::string, std::function<void()> *> *keymap);
 
-private:
-    std::map<Hotkey, std::function<void()>> *keymap;
-};
+    bool remove_keymap(KeymapEventFilter *event_filter);
 
-void hotkeys_register_event_filter(QApplication *app, std::map<Hotkey, std::function<void()>> *keymap);
+}
 
 #endif //TOOLBOX_HOTKEYS_HPP

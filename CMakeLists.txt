@@ -38,6 +38,8 @@ add_executable(toolbox #WIN32
         webview_frame.ui
         hotkeys.cpp
         hotkeys.hpp
+        window_management.cpp
+        window_management.hpp
         #        webview_test.cpp
 )
 

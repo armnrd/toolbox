@@ -9,10 +9,9 @@ hotkeys:
       toggle_maximize: meta+return
       close: meta+esc
       resize: ctrl+meta+alt+comma
-    mode:
+    position:
       lower_screen: ctrl+meta+alt+M
       upper_screen: ctrl+meta+alt+U
-    position:
       right_middle: ctrl+meta+alt+3
       top_right: ctrl+meta+alt+4
       top_middle: ctrl+meta+alt+5

@@ -15,13 +15,11 @@
 
 typedef YAML::Node Config;
 
-class ConfigHelper
+namespace ConfigHelper
 {
-public:
-    static Config load_config(const std::string& filename);
+    Config load_config(const std::string& filename);
 
-    static void save_config(const std::string& filename, const Config& cfg);
+    void save_config(const std::string& filename, const Config& cfg);
 };
-
 
 #endif //TOOLBOX_CONFIG_HPP
