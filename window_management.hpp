@@ -15,13 +15,15 @@
 
 namespace window_management
 {
-    void minimize();
+    void action_minimize();
 
-    void toggle_maximize();
+    void action_toggle_maximize();
 
-    void close();
+    void action_close();
 
-    void resize();
+    void action_resize();
+
+    void position_centre();
 
     void position_lower_screen();
 
@@ -43,21 +45,19 @@ namespace window_management
 
     void position_bottom_right();
 
-    void move_centre();
-
     void move_fast_left();
-
-    void move_fast_right();
-
-    void move_fast_up();
-
-    void move_fast_down();
 
     void move_slow_left();
 
+    void move_fast_right();
+
     void move_slow_right();
 
+    void move_fast_up();
+
     void move_slow_up();
+
+    void move_fast_down();
 
     void move_slow_down();
 };

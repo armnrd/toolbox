@@ -6,53 +6,50 @@
  * @date 03/12/2024
  */
 
-#include <QApplication>
-#include <QAbstractNativeEventFilter>
-#include <windows.h>
 #include "hotkeys.hpp"
 
 
-hotkeys::KeymapEventFilter::KeymapEventFilter(QObject *parent, std::map<std::string, std::function<void()> *> *keymap) : QObject(parent), id_map {}
+hotkeys::KeyMapEventFilter::KeyMapEventFilter(QObject *parent, KeyMap *key_map) : QObject(parent)
 {
-    this->keymap = keymap;
+    this->key_map = key_map;
+    this->id_map = new IDMap();
     unsigned int id = 0;
-    for (auto &keymap_pair : *keymap) {
-        auto keycode = keycode_from_combination(keymap_pair.first);
-        auto modifiers = modifiers_from_combination(keymap_pair.first);
-        if (RegisterHotKey(nullptr, id, modifiers,keycode)) {
-            id_map->insert({id, keymap_pair.second});
+    for (auto &pair : *key_map) {
+        auto key_code = keycode_from_description(pair.first);
+        auto modifiers = modifiers_from_description(pair.first);
+        if (RegisterHotKey(nullptr, id, modifiers, key_code)) {
+            id_map->insert({id, pair.second});
             id++;
-            qDebug() << std::format("Combination {} registered successfully.", keymap_pair.first);
+            qDebug() << std::format("Combination {} registered successfully.", pair.first);
         } else {
-            qDebug() << std::format("Failed to register combination {}.", keymap_pair.first);
+            qDebug() << std::format("Failed to register combination {}.", pair.first);
         }
     }
 }
 
-hotkeys::KeymapEventFilter::~KeymapEventFilter()
+hotkeys::KeyMapEventFilter::~KeyMapEventFilter()
 {
     // Unregister the hotkey
     UnregisterHotKey(nullptr, 1);
 }
 
 // Override native event filter to capture the WM_HOTKEY message
-bool hotkeys::KeymapEventFilter::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
+bool hotkeys::KeyMapEventFilter::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
 {
     if (eventType == "windows_generic_MSG" || eventType == "windows_dispatcher_MSG") {
         MSG *msg = static_cast<MSG *>(message);
         if (msg->message == WM_HOTKEY) {
             auto hotkey_id = msg->wParam; // ID of the hotkey
-            auto it = std::next(keymap->begin(), hotkey_id);
-            qDebug() << std::format("Combination {} pressed.", it->first);
+            (*id_map)[hotkey_id]();
             return true;
         }
     }
     return false;
 }
 
-unsigned int hotkeys::KeymapEventFilter::keycode_from_combination(std::string combination)
+unsigned int hotkeys::KeyMapEventFilter::keycode_from_description(std::string description)
 {
-    static const std::map<std::string, int> key_map = {
+    static std::map<std::string, int> keycode_map = {
         {"A", 'A'}, {"B", 'B'}, {"C", 'C'}, {"D", 'D'}, {"E", 'E'},
         {"F", 'F'}, {"G", 'G'}, {"H", 'H'}, {"I", 'I'}, {"J", 'J'},
         {"K", 'K'}, {"L", 'L'}, {"M", 'M'}, {"N", 'N'}, {"O", 'O'},
@@ -71,46 +68,57 @@ unsigned int hotkeys::KeymapEventFilter::keycode_from_combination(std::string co
         {"F5", VK_F5}, {"F6", VK_F6}, {"F7", VK_F7}, {"F8", VK_F8},
         {"F9", VK_F9}, {"F10", VK_F10}, {"F11", VK_F11}, {"F12", VK_F12},
         {"capslock", VK_CAPITAL}, {"numlock", VK_NUMLOCK},
-        {"scrlock", VK_SCROLL}
+        {"scrlock", VK_SCROLL}, {"plus", VK_OEM_PLUS},
+        {"comma", VK_OEM_COMMA}, {"minus", VK_OEM_MINUS},
+        {"period", VK_OEM_PERIOD}
     };
 
     // TODO error handling
-    const std::string key_desc = combination.substr(combination.find("+") + 1);
+    std::string key_desc = description.substr(description.rfind("+") + 1);
 
-    return key_map[key_desc];
+    return keycode_map[key_desc];
 }
 
-unsigned int hotkeys::KeymapEventFilter::modifiers_from_combination(std::string combination)
+unsigned int hotkeys::KeyMapEventFilter::modifiers_from_description(std::string description)
 {
     unsigned int modifiers = 0;
 
-    if (combination.contains("ctrl")) {
-        modifiers |= MOD_CONTROL;
-    }
-
-    if (combination.contains("alt")) {
-        modifiers |= MOD_ALT;
-    }
-
-    if (combination.contains("shift")) {
+    // TODO error handling
+    if (description.contains("shift")) {
         modifiers |= MOD_SHIFT;
     }
 
-    if (combination.contains("meta")) {
+    if (description.contains("ctrl")) {
+        modifiers |= MOD_CONTROL;
+    }
+
+    if (description.contains("meta")) {
         modifiers |= MOD_WIN;
+    }
+
+    if (description.contains("alt")) {
+        modifiers |= MOD_ALT;
     }
 
     return modifiers;
 }
 
-hotkeys::KeymapEventFilter *hotkeys::install_keymap(QApplication *app, std::map<std::string, std::function<void()> *> *keymap)
+/**
+ * @brief Installs a KeyMap.
+ *
+ * @param app - reference to main application
+ * @param key_map - KeyMap to register with the event filter
+ * @return the NativeEventFilter object generated from the key_map; for use later if the key_map needs changing
+ * @note placeholder
+ */
+hotkeys::KeyMapEventFilter *hotkeys::install_keymap(QApplication *app, KeyMap *key_map)
 {
-    KeymapEventFilter *event_filter = new KeymapEventFilter(app, keymap);
+    KeyMapEventFilter *event_filter = new KeyMapEventFilter(app, key_map);
     app->installNativeEventFilter(event_filter);
     return event_filter;
 }
 
-bool hotkeys::remove_keymap(KeymapEventFilter *event_filter)
+bool hotkeys::remove_keymap(KeyMapEventFilter *event_filter)
 {
     return false;
 }
