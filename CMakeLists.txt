@@ -40,6 +40,8 @@ add_executable(toolbox #WIN32
         webview_frame.cpp
         webview_frame.hpp
         webview_frame.ui
+        tray_icon.cpp
+        tray_icon.hpp
         #        webview_test.cpp
 )
 
