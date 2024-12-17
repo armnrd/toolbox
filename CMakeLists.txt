@@ -33,13 +33,13 @@ add_executable(toolbox #WIN32
         main.cpp
         config.cpp
         config.hpp
-        webview_frame.cpp
-        webview_frame.hpp
-        webview_frame.ui
         hotkeys.cpp
         hotkeys.hpp
         window_management.cpp
         window_management.hpp
+        webview_frame.cpp
+        webview_frame.hpp
+        webview_frame.ui
         #        webview_test.cpp
 )
 

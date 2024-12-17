@@ -40,7 +40,7 @@ namespace hotkeys
     
     KeyMapEventFilter *install_keymap(QApplication *app, std::map<std::string, std::function<void()>> *key_map);
 
-    bool remove_keymap(KeyMapEventFilter *event_filter);
+    void remove_keymap(QApplication *app, KeyMapEventFilter *event_filter);
 }
 
 #endif //TOOLBOX_HOTKEYS_HPP
