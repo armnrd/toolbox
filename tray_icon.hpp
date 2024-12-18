@@ -14,6 +14,8 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QAction>
+#include <QPixmap>
+#include <QPainter>
 #include <QIcon>
 #include <QMessageBox>
 

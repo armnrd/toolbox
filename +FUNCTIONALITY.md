@@ -1,6 +1,8 @@
 # Primary
 
 - [X] window management: minimize, maximize, resize, edge-move, bottom-screen
+- [ ] startup apps from launch_apps.ahk
+- [ ] app keybindings: mmsys.cpl
 - [ ] show Todoist tasks as desktop underlay
 - [ ] firefox app hotkeys: focus to tab in running Firefox using marionette
 - https://stackoverflow.com/questions/1820825/global-hotkey-with-win32-api

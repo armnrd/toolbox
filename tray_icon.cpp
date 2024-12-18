@@ -9,6 +9,23 @@
 #include "tray_icon.hpp"
 
 
+// Function to create an emoji-based QIcon
+QIcon icon_from_emoji(const QString &emoji) {
+    // Create a pixmap with a transparent background
+    QPixmap pixmap(32, 32); // Adjust size as needed for the tray icon
+    pixmap.fill(Qt::transparent);
+
+    // Draw the emoji onto the pixmap
+    QPainter painter(&pixmap);
+    QFont font("Segoe UI Emoji", 24); // Font that supports emojis
+    painter.setFont(font);
+    painter.setPen(Qt::black); // Set pen color for the emoji
+    painter.drawText(pixmap.rect(), Qt::AlignCenter, emoji); // Center the emoji
+    painter.end();
+
+    return QIcon(pixmap);
+}
+
 QSystemTrayIcon *tray_icon::create(QApplication *app) {
     // TODO error handling
     // Check if the system tray is available
@@ -21,7 +38,7 @@ QSystemTrayIcon *tray_icon::create(QApplication *app) {
     QSystemTrayIcon *tray_icon = new QSystemTrayIcon();
 
     // Set the icon for the tray
-    tray_icon->setIcon(app->style()->standardIcon(QStyle::SP_VistaShield));
+    tray_icon->setIcon(icon_from_emoji("🛠"));
 
     // Create a context menu for the tray icon
     QMenu *menu = new QMenu();
@@ -48,7 +65,7 @@ QSystemTrayIcon *tray_icon::create(QApplication *app) {
     tray_icon->show();
 
     // Display a balloon message
-    tray_icon->showMessage("Welcome", "Your app is running in the system tray!", QSystemTrayIcon::Information, 3000);
+    tray_icon->showMessage("Toolbox", "Running in the system tray.", QSystemTrayIcon::Information, 2000);
 
     return tray_icon;
 }

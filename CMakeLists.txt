@@ -29,7 +29,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(yaml-cpp)
 
-add_executable(toolbox #WIN32
+add_executable(toolbox WIN32
         main.cpp
         config.cpp
         config.hpp
