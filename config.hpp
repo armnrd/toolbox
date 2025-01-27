@@ -9,8 +9,6 @@
 #ifndef TOOLBOX_CONFIG_HPP
 #define TOOLBOX_CONFIG_HPP
 
-#include "hotkeys.hpp"
-#include "window_management.hpp"
 #include <string>
 #include <format>
 #include <fstream>
@@ -19,15 +17,15 @@
 #include <yaml-cpp/yaml.h>
 
 
-typedef YAML::Node Config;
-
 namespace config
 {
-    Config *load_config(const std::string filename);
+    typedef YAML::Node Config;
 
-    void save_config(const std::string filename, Config *cfg);
+    Config *config_from_file(const std::string filename);
 
-    hotkeys::KeyMap *keymap_from_config(Config *cfg);
+    void config_to_file(Config *config, const std::string filename);
+
+    void show_editor(Config *config);
 };
 
 #endif //TOOLBOX_CONFIG_HPP

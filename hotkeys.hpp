@@ -9,6 +9,8 @@
 #ifndef TOOLBOX_HOTKEYS_HPP
 #define TOOLBOX_HOTKEYS_HPP
 
+#include "config.hpp"
+#include "window_management.hpp"
 #include <map>
 #include <string>
 #include <functional>
@@ -21,9 +23,10 @@ namespace hotkeys
     typedef std::map<std::string, std::function<void()>> KeyMap;
     typedef std::map<unsigned int, std::function<void()>> IDMap;
 
-    class KeyMapEventFilter : public QObject, public QAbstractNativeEventFilter {
+    class KeyMapEventFilter : public QObject, public QAbstractNativeEventFilter
+    {
     public:
-        KeyMapEventFilter(QObject* parent, std::map<std::string, std::function<void()>> *key_map);
+        KeyMapEventFilter(std::map<std::string, std::function<void()>> *key_map);
 
         ~KeyMapEventFilter();
 
@@ -37,10 +40,18 @@ namespace hotkeys
         unsigned int keycode_from_description(std::string);
         unsigned int modifiers_from_description(std::string);
     };
-    
-    KeyMapEventFilter *install_keymap(QApplication *app, std::map<std::string, std::function<void()>> *key_map);
 
-    void remove_keymap(QApplication *app, KeyMapEventFilter *event_filter);
+    class Factory
+    {
+    public:
+        void set_keymap(KeyMap *key_map, QApplication *app);
+
+    private:
+        KeyMap *key_map = nullptr;
+        KeyMapEventFilter *key_map_event_filter = nullptr;
+    };
+
+    KeyMap *keymap_from_config(config::Config *config);
 }
 
 #endif //TOOLBOX_HOTKEYS_HPP

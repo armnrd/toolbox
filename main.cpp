@@ -1,34 +1,37 @@
-#include <QApplication>
-#include <QAbstractNativeEventFilter>
-#include <QPushButton>
-#include <windows.h>
-#include <QMessageBox>
-#include <iostream>
+/**
+ * @file main.hpp
+ * @brief ${DESCRIPTION}
+ *
+ * @author Arindam
+ * @date 19/12/2024
+ */
+
+#include "toolbox.hpp"
 #include "config.hpp"
 #include "hotkeys.hpp"
-#include "window_management.hpp"
 #include "tray_icon.hpp"
-
-void ctrl_meta_alt_O()
-{
-    qDebug() << "ctrl+meta+alt+O pressed.";
-}
+#include "hacks.hpp"
+//#include "window_management.hpp"
 
 int main(int argc, char *argv[])
 {
     try {
-        QApplication app(argc, argv);
+        auto app = new Toolbox(argc, argv);
 
-        auto cfg = config::load_config("config.yml");
-        auto key_map = config::keymap_from_config(cfg);
-        hotkeys::install_keymap(&app, key_map);
-        auto tray_icon = tray_icon::create(&app);
+        hacks::set_display_scaling(150);
+
+//        auto config = config::config_from_file("config.yml");
+//
+//        auto hotkey_factory = new hotkeys::Factory();
+//        hotkey_factory->set_keymap(hotkeys::keymap_from_config(config), app);
+//
+//        auto tray_icon = new tray_icon::TrayIcon(app, config);
 
 //        auto keymap = new std::map<std::string, std::function<void()>>();
 //        keymap->insert({"ctrl+meta+alt+O", window_management::position_lower_screen});
-//        hotkeys::install_keymap(&a, keymap);
+//        hotkeys::set_keymap(&a, keymap);
 
-        return app.exec();
+        return app->exec();
     } catch (const std::exception& e) {
         qDebug() << "Caught exception: " << e.what() << '\n';
     }

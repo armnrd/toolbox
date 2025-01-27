@@ -5,7 +5,7 @@ general:
 hotkeys:
   window:
     action:
-      minimize: meta+del
+      minimize: meta+minus
       toggle_maximize: meta+return
       close: meta+esc
       resize: ctrl+meta+alt+comma

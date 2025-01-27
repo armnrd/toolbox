@@ -29,7 +29,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(yaml-cpp)
 
-add_executable(toolbox WIN32
+add_executable(toolbox #WIN32
         main.cpp
         config.cpp
         config.hpp
@@ -42,6 +42,14 @@ add_executable(toolbox WIN32
         webview_frame.ui
         tray_icon.cpp
         tray_icon.hpp
+        config_editor_frame.cpp
+        config_editor_frame.hpp
+        config_editor_frame.ui
+        toolbox.hpp
+        hacks.cpp
+        hacks.hpp
+        hacks_dpi_scaling.cpp
+        hacks_dpi_scaling.hpp
         #        webview_test.cpp
 )
 

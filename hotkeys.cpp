@@ -38,7 +38,34 @@ static std::map<std::string, int> modifier_map = {
         {"meta", MOD_WIN}, {"alt", MOD_ALT}
 };
 
-hotkeys::KeyMapEventFilter::KeyMapEventFilter(QObject *parent, KeyMap *key_map) : QObject(parent)
+// Map from function names to functions
+static std::map<std::string, std::function<void()>> function_map = {
+        {"window_management::action_minimize", window_management::action_minimize},
+        {"window_management::action_toggle_maximize", window_management::action_toggle_maximize},
+        {"window_management::action_close", window_management::action_close},
+        {"window_management::action_resize", window_management::action_resize},
+        {"window_management::position_centre", window_management::position_centre},
+        {"window_management::position_lower_screen", window_management::position_lower_screen},
+        {"window_management::position_upper_screen", window_management::position_upper_screen},
+        {"window_management::position_right_middle", window_management::position_right_middle},
+        {"window_management::position_top_right", window_management::position_top_right},
+        {"window_management::position_top_middle", window_management::position_top_middle},
+        {"window_management::position_top_left", window_management::position_top_left},
+        {"window_management::position_left_middle", window_management::position_left_middle},
+        {"window_management::position_bottom_left", window_management::position_bottom_left},
+        {"window_management::position_bottom_middle", window_management::position_bottom_middle},
+        {"window_management::position_bottom_right", window_management::position_bottom_right},
+        {"window_management::move_fast_left", window_management::move_fast_left},
+        {"window_management::move_slow_left", window_management::move_slow_left},
+        {"window_management::move_fast_right", window_management::move_fast_right},
+        {"window_management::move_slow_right", window_management::move_slow_right},
+        {"window_management::move_fast_up", window_management::move_fast_up},
+        {"window_management::move_slow_up", window_management::move_slow_up},
+        {"window_management::move_fast_down", window_management::move_fast_down},
+        {"window_management::move_slow_down", window_management::move_slow_down}
+};
+
+hotkeys::KeyMapEventFilter::KeyMapEventFilter(KeyMap *key_map)
 {
     this->key_map = key_map;
     this->id_map = new IDMap();
@@ -49,17 +76,16 @@ hotkeys::KeyMapEventFilter::KeyMapEventFilter(QObject *parent, KeyMap *key_map) 
         if (RegisterHotKey(nullptr, id, modifiers, key_code)) {
             id_map->insert({id, pair.second});
             id++;
-            qDebug() << std::format("Combination {} registered successfully.", pair.first);
+            qDebug() << std::format("Combination {} registered successfully: {:#X} {:#X}", pair.first, key_code, modifiers);
         } else {
-            qDebug() << std::format("Failed to register combination {}.", pair.first);
+            qDebug() << std::format("Failed to register combination {}: {:#X} {:#X}", pair.first, key_code, modifiers);
         }
     }
 }
 
 hotkeys::KeyMapEventFilter::~KeyMapEventFilter()
 {
-    // Unregister the hotkey
-    UnregisterHotKey(nullptr, 1);
+    // TODO placeholder
 }
 
 // Override native event filter to capture the WM_HOTKEY message
@@ -101,19 +127,34 @@ unsigned int hotkeys::KeyMapEventFilter::modifiers_from_description(std::string 
 /**
  * @brief Installs a KeyMap.
  *
- * @param app - reference to main application
  * @param key_map - KeyMap to register with the event filter
- * @return the NativeEventFilter object generated from the key_map; for use later if the key_map needs changing
+ * @param app - reference to main application; the KeyMap will be installed on this
  * @note placeholder
  */
-hotkeys::KeyMapEventFilter *hotkeys::install_keymap(QApplication *app, KeyMap *key_map)
+void hotkeys::Factory::set_keymap(hotkeys::KeyMap *key_map, QApplication *app)
 {
-    KeyMapEventFilter *event_filter = new KeyMapEventFilter(app, key_map);
+    // If a KeyMapEventFilter was already installed on app, remove it
+    if (key_map_event_filter) {
+        app->removeNativeEventFilter(key_map_event_filter);
+    }
+
+    KeyMapEventFilter *event_filter = new KeyMapEventFilter(key_map);
     app->installNativeEventFilter(event_filter);
-    return event_filter;
 }
 
-void hotkeys::remove_keymap(QApplication *app, KeyMapEventFilter *event_filter)
+hotkeys::KeyMap *hotkeys::keymap_from_config(config::Config *config)
 {
-    app->removeEventFilter(event_filter);
+    auto key_map = new hotkeys::KeyMap();
+
+    // Use iterators to iterate over Window management key combinations
+    for (auto it = (*config)["hotkeys"]["window"].begin(); it != (*config)["hotkeys"]["window"].end(); ++it) {
+        for (auto jt = it->second.begin(); jt != it->second.end(); ++jt) {
+            auto function_name = std::format("window_management::{}_{}", it->first.as<std::string>(), jt->first.as<std::string>());
+            // TODO error handling
+            key_map->insert({jt->second.as<std::string>(), function_map[function_name]});
+        }
+    }
+
+    return key_map;
 }
+
