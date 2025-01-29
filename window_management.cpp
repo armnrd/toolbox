@@ -9,7 +9,61 @@
 #include "window_management.hpp"
 #include <windows.h>
 #include <QDebug>
+#include <QApplication>
+#include <QWindow>
+#include <QWidget>
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QIntValidator>
 
+// TODO beautify
+class ResizeDialog : public QDialog {
+public:
+    ResizeDialog(QWidget *parent = nullptr) : QDialog(parent) {
+        setWindowTitle("Enter Window Dimensions");
+        setModal(true);
+
+        QVBoxLayout *main_layout = new QVBoxLayout(this);
+        QHBoxLayout *width_layout = new QHBoxLayout();
+        QHBoxLayout *height_layout = new QHBoxLayout();
+        QHBoxLayout *button_layout = new QHBoxLayout();
+
+        QLabel *width_label = new QLabel("Width:");
+        width_input = new QLineEdit(this);
+        width_input->setValidator(new QIntValidator(100, 2000, this));
+        width_layout->addWidget(width_label);
+        width_layout->addWidget(width_input);
+
+        QLabel *height_label = new QLabel("Height:");
+        height_input = new QLineEdit(this);
+        height_input->setValidator(new QIntValidator(100, 2000, this));
+        height_layout->addWidget(height_label);
+        height_layout->addWidget(height_input);
+
+        QPushButton *resize_button = new QPushButton("Resize", this);
+        QPushButton *cancel_button = new QPushButton("Cancel", this);
+        button_layout->addWidget(resize_button);
+        button_layout->addWidget(cancel_button);
+
+        main_layout->addLayout(width_layout);
+        main_layout->addLayout(height_layout);
+        main_layout->addLayout(button_layout);
+
+        connect(resize_button, &QPushButton::clicked, this, &ResizeDialog::accept);
+        connect(cancel_button, &QPushButton::clicked, this, &ResizeDialog::reject);
+    }
+
+    int input_width() const { return width_input->text().toInt(); }
+    int input_height() const { return height_input->text().toInt(); }
+
+private:
+    QLineEdit *width_input;
+    QLineEdit *height_input;
+};
 
 // Distance constants for the move functions
 static const long fast_distance = 50, slow_distance = 10;
@@ -105,7 +159,19 @@ void window_management::action_close()
 
 void window_management::action_resize()
 {
+    // Obtain window info
+    auto [window_handle, window_rect, window_width, window_height] = foreground_window_info();
 
+    // TODO hack - remove when beautifying dialog
+    ResizeDialog dialog;
+    dialog.setProperty("_q_windowsParentHwnd", reinterpret_cast<WId>(window_handle));
+
+    // Resize it
+    if (dialog.exec() == QDialog::Accepted) {
+        if (!SetWindowPos(window_handle, nullptr, window_rect.left, window_rect.top, dialog.input_width(), dialog.input_height(), SWP_NOZORDER)) {
+            qDebug() << "Error: Could not resize the window!";
+        }
+    }
 }
 
 void window_management::position_centre()
@@ -125,7 +191,7 @@ void window_management::position_centre()
     long target_y = screen_rect.top + (screen_height - window_height) / 2;
 
     // Move the window to the center position
-    if (!MoveWindow(window_handle, target_x, target_y, window_width, window_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, window_width, window_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 }
@@ -148,7 +214,7 @@ void window_management::position_lower_screen()
     long target_x = (screen_rect.right - target_width) / 2;
     long target_y = screen_rect.bottom - target_height;
 
-    if (!MoveWindow(window_handle, target_x, target_y, target_width, target_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, target_width, target_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 }
@@ -171,7 +237,7 @@ void window_management::position_upper_screen()
     long target_x = (screen_rect.right - target_width) / 2;
     long target_y = 0;
 
-    if (!MoveWindow(window_handle, target_x, target_y, target_width, target_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, target_width, target_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 }
@@ -194,7 +260,7 @@ void window_management::position_right_middle()
     long target_x = screen_rect.right - target_width;
     long target_y = (screen_rect.bottom - target_height) / 2;
 
-    if (!MoveWindow(window_handle, target_x, target_y, target_width, target_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, target_width, target_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 }
@@ -217,7 +283,7 @@ void window_management::position_top_right()
     long target_x = screen_rect.right - target_width;
     long target_y = 0;
 
-    if (!MoveWindow(window_handle, target_x, target_y, target_width, target_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, target_width, target_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 }
@@ -240,7 +306,7 @@ void window_management::position_top_middle()
     long target_x = (screen_rect.right - target_width) / 2;
     long target_y = 0;
 
-    if (!MoveWindow(window_handle, target_x, target_y, target_width, target_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, target_width, target_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 }
@@ -263,7 +329,7 @@ void window_management::position_top_left()
     long target_x = 0;
     long target_y = 0;
 
-    if (!MoveWindow(window_handle, target_x, target_y, target_width, target_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, target_width, target_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 }
@@ -286,7 +352,7 @@ void window_management::position_left_middle()
     long target_x = 0;
     long target_y = (screen_rect.bottom - target_height) / 2;
 
-    if (!MoveWindow(window_handle, target_x, target_y, target_width, target_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, target_width, target_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 }
@@ -309,7 +375,7 @@ void window_management::position_bottom_left()
     long target_x = 0;
     long target_y = screen_rect.bottom - target_height;
 
-    if (!MoveWindow(window_handle, target_x, target_y, target_width, target_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, target_width, target_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 }
@@ -332,7 +398,7 @@ void window_management::position_bottom_middle()
     long target_x = (screen_rect.right - target_width) / 2;
     long target_y = screen_rect.bottom - target_height;
 
-    if (!MoveWindow(window_handle, target_x, target_y, target_width, target_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, target_width, target_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 }
@@ -355,7 +421,7 @@ void window_management::position_bottom_right()
     long target_x = screen_rect.right - target_width;
     long target_y = screen_rect.bottom - target_height;
 
-    if (!MoveWindow(window_handle, target_x, target_y, target_width, target_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, target_width, target_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 }
@@ -384,7 +450,7 @@ void move_left(long distance)
         target_x = 0;
     }
 
-    if (!MoveWindow(window_handle, target_x, target_y, target_width, target_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, target_width, target_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 }
@@ -413,7 +479,7 @@ void move_right(long distance)
         target_x = screen_rect.right - target_width;
     }
 
-    if (!MoveWindow(window_handle, target_x, target_y, target_width, target_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, target_width, target_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 }
@@ -442,7 +508,7 @@ void move_up(long distance)
         target_y = 0;
     }
 
-    if (!MoveWindow(window_handle, target_x, target_y, target_width, target_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, target_width, target_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 
@@ -472,7 +538,7 @@ void move_down(long distance)
         target_y = screen_rect.bottom - target_height;
     }
 
-    if (!MoveWindow(window_handle, target_x, target_y, target_width, target_height, TRUE)) {
+    if (!SetWindowPos(window_handle, nullptr, target_x, target_y, target_width, target_height, SWP_NOZORDER)) {
         qDebug() << "Error: Could not move the window!";
     }
 
