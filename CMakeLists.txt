@@ -46,11 +46,10 @@ add_executable(toolbox #WIN32
         config_editor_frame.hpp
         config_editor_frame.ui
         toolbox.hpp
-#        hacks.cpp
-#        hacks.hpp
-#        hacks_dpi_scaling.cpp
-#        hacks_dpi_scaling.hpp
-        #        webview_test.cpp
+        hacks.cpp
+        hacks.hpp
+        hacks_dpi_scaling.cpp
+        hacks_dpi_scaling.hpp
 )
 
 target_link_libraries(toolbox

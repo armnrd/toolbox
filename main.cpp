@@ -10,11 +10,11 @@
 #include "config.hpp"
 #include "hotkeys.hpp"
 #include "tray_icon.hpp"
-//#include "hacks.hpp"
-//#include "window_management.hpp"
+#include "hacks.hpp"
 
 int main(int argc, char *argv[])
 {
+//    hacks::set_display_scaling(125, 0);
     try {
         auto app = new Toolbox(argc, argv);
 

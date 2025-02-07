@@ -7,41 +7,33 @@
  */
 
 #include "hacks.hpp"
+#include "hacks_dpi_scaling.hpp"
 
-void hacks::set_display_scaling(int scaling_percentage)
+void hacks::set_display_scaling(int scaling_percentage, int display_index)
 {
-    // Get the primary display device
-    DISPLAY_DEVICE display_device = {0};
-    display_device.cb = sizeof(DISPLAY_DEVICE);
+    auto display_data_cache = hacks_dpi_scaling::get_display_data();
 
-    if (!EnumDisplayDevices(NULL, 0, &display_device, 0)) {
-        qDebug() << "Failed to enumerate display devices.";
+    auto current_resolution = hacks_dpi_scaling::get_dpi_scaling_info(display_data_cache[display_index].adapter_id, display_data_cache[display_index].source_id);
+
+    auto success = hacks_dpi_scaling::set_dpi_scaling(display_data_cache[display_index].adapter_id, display_data_cache[display_index].source_id, scaling_percentage);
+
+    if (success == false)
+    {
+        qDebug() << "set_dpi_scaling() failed";
         return;
     }
-
-    // Retrieve the current display settings
-    DEVMODE dev_mode = {0};
-    dev_mode.dmSize = sizeof(DEVMODE);
-
-    if (!EnumDisplaySettings(display_device.DeviceName, ENUM_CURRENT_SETTINGS, &dev_mode)) {
-        qDebug() << "Failed to get current display settings.";
-        return;
-    }
-
-    // Adjust the scaling factor (DPI settings are often related to screen resolution scaling)
-    int base_dpi = 96; // Default DPI (100%)
-    int new_dpi = (scaling_percentage * base_dpi) / 100;
-
-    dev_mode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT; // Example resolution change
-    dev_mode.dmPelsWidth = dev_mode.dmPelsWidth * new_dpi / base_dpi;
-    dev_mode.dmPelsHeight = dev_mode.dmPelsHeight * new_dpi / base_dpi;
-
-    // Apply the new settings
-    LONG result = ChangeDisplaySettingsEx(display_device.DeviceName, &dev_mode, NULL, CDS_UPDATEREGISTRY, NULL);
-
-    if (result != DISP_CHANGE_SUCCESSFUL) {
-        qDebug() << "Failed to change display settings. Error: " << result;
-    } else {
-        qDebug() << "Display scaling changed successfully to " << scaling_percentage << "%";
+    else
+    {
+        if (display_index == 0)
+        {
+            HKEY hKey;
+            LPCWSTR sKeyPath;
+            DWORD value = static_cast<DWORD>(int(scaling_percentage * 0.96));
+            int iResult;
+            sKeyPath = L"Control Panel\\Desktop\\WindowMetrics\\";
+            iResult = RegOpenKeyEx(HKEY_CURRENT_USER, sKeyPath, NULL, KEY_ALL_ACCESS, &hKey);
+            iResult = RegSetValueEx(hKey, L"AppliedDPI", NULL, REG_DWORD, (const BYTE*)&value, sizeof(value));
+            RegCloseKey(hKey);
+        }
     }
 }

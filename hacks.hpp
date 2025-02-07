@@ -14,7 +14,7 @@
 
 namespace hacks
 {
-    void set_display_scaling(int scaling_percentage);
+    void set_display_scaling(int scaling_percentage, int display_index);
 }
 
 #endif //TOOLBOX_HACKS_HPP
