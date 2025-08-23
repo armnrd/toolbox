@@ -1,11 +1,3 @@
-/**
- * @file hacks.cpp
- * @brief ${DESCRIPTION}
- *
- * @author Arindam
- * @date 22/12/2024
- */
-
 #include "hacks.hpp"
 #include "hacks_dpi_scaling.hpp"
 

@@ -25,7 +25,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(nlohmann_json)
 
-add_executable(toolbox WIN32
+set(TOOLBOX_SOURCES
+        resources.qrc
         main.cpp
         config.cpp
         config.hpp
@@ -45,16 +46,20 @@ add_executable(toolbox WIN32
         hacks_dpi_scaling.hpp
 )
 
-target_link_libraries(toolbox
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    qt_add_executable(toolbox WIN32 ${TOOLBOX_SOURCES})
+else ()
+    qt_add_executable(toolbox ${TOOLBOX_SOURCES})
+endif ()
+
+target_sources(toolbox PRIVATE "resources.rc")
+
+target_link_libraries(toolbox PRIVATE
         Qt::Core
         Qt::Gui
         Qt::Widgets
         nlohmann_json::nlohmann_json
 )
-
-target_sources(toolbox PRIVATE "resources.rc")
-
-qt_add_resources(toolbox.hpp "resources.qrc")
 
 # Copy configuration, etc. files to the build directory after building the target
 add_custom_command(
@@ -63,10 +68,7 @@ add_custom_command(
 )
 
 # Deployment for Windows to include all necessary DLLs and plugins
-set(DEPLOYQT_FLAGS "--no-translations --no-compiler-runtime")
-if (CMAKE_BUILD_TYPE STREQUAL Release)
-    set(DEPLOYQT_FLAGS "--release ${DEPLOYQT_FLAGS}")
-endif ()
+set(DEPLOYQT_FLAGS $<$<NOT:$<CONFIG:Debug>>:--release> --no-translations --no-compiler-runtime)
 add_custom_command(TARGET toolbox POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E echo "Running windeployqt..."
         COMMAND windeployqt.exe ${DEPLOYQT_FLAGS} $<TARGET_FILE:toolbox>

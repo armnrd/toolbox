@@ -1,30 +1,5 @@
-/**
- * @file tray_icon.cpp
- * @brief ${DESCRIPTION}
- *
- * @author Arindam
- * @date 17/12/2024
- */
-
+#include <QFile>
 #include "tray_icon.hpp"
-
-
-// Function to create an emoji-based QIcon
-QIcon icon_from_emoji(const QString &emoji) {
-    // Create a pixmap with a transparent background
-    QPixmap pixmap(256, 256); // Adjust size as needed for the tray icon
-    pixmap.fill(Qt::transparent);
-
-    // Draw the emoji onto the pixmap
-    QPainter painter(&pixmap);
-    QFont font("Segoe UI Emoji", 160); // Font that supports emojis
-    painter.setFont(font);
-    painter.setPen(Qt::black); // Set pen color for the emoji
-    painter.drawText(pixmap.rect(), Qt::AlignCenter, emoji); // Center the emoji
-    painter.end();
-
-    return QIcon(pixmap);
-}
 
 // TODO Toolbox object holds members that the various parts need to access
 tray_icon::TrayIcon::TrayIcon(Toolbox *app, config::Config *config) : QSystemTrayIcon(app)
@@ -41,7 +16,7 @@ tray_icon::TrayIcon::TrayIcon(Toolbox *app, config::Config *config) : QSystemTra
     this->config = config;
 
     // Set the icon
-    setIcon(icon_from_emoji("🛠"));
+    setIcon(QIcon(":/toolbox.ico"));
 
     // Create a context menu for the tray icon
     auto menu = new QMenu();

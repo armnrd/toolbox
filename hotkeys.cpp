@@ -1,13 +1,4 @@
-/**
- * @file hotkeys.cpp
- * @brief ${DESCRIPTION}
- *
- * @author Arindam
- * @date 03/12/2024
- */
-
 #include "hotkeys.hpp"
-
 
 static std::map<std::string, int> keycode_map = {
         {"A", 'A'}, {"B", 'B'}, {"C", 'C'}, {"D", 'D'}, {"E", 'E'},

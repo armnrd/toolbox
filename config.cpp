@@ -1,19 +1,11 @@
-/**
- * @file config.cpp
- * @brief ${DESCRIPTION}
- *
- * @author Arindam
- * @date 11/11/2024
- */
-
 #include "config.hpp"
 #include "toolbox.hpp"
-
 
 // Function to load the JSON config file into the Toolbox object
 config::Config *config::config_from_file(const std::string filename)
 {
     // TODO error handling
+    qDebug() << "Loading config from file:" << QString::fromStdString(filename);
     return new Config(Config::parse(std::ifstream(filename)));
 }
 

@@ -1,11 +1,3 @@
-/**
- * @file hacks_dpi_scaling.hpp
- * @brief ${DESCRIPTION}
- *
- * @author Arindam
- * @date 27/01/2025
- */
-
 #ifndef TOOLBOX_HACKS_DPI_SCALING_HPP
 #define TOOLBOX_HACKS_DPI_SCALING_HPP
 

@@ -1,11 +1,3 @@
-/**
- * @file window_management.cpp
- * @brief ${DESCRIPTION}
- *
- * @author Arindam
- * @date 16/12/2024
- */
-
 #include "window_management.hpp"
 #include <windows.h>
 #include <QDebug>

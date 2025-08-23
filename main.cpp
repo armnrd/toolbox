@@ -1,11 +1,3 @@
-/**
- * @file main.hpp
- * @brief ${DESCRIPTION}
- *
- * @author Arindam
- * @date 19/12/2024
- */
-
 #include "toolbox.hpp"
 #include "config.hpp"
 #include "hotkeys.hpp"

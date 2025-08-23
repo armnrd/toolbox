@@ -1,11 +1,3 @@
-/**
- * @file config.hpp
- * @brief ${DESCRIPTION}
- *
- * @author Arindam
- * @date 11/11/2024
- */
-
 #ifndef TOOLBOX_CONFIG_HPP
 #define TOOLBOX_CONFIG_HPP
 
@@ -15,7 +7,6 @@
 #include <format>
 #include <QDebug>
 #include <nlohmann/json.hpp>
-
 
 namespace config
 {

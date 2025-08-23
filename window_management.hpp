@@ -1,17 +1,8 @@
-/**
- * @file window_management.hpp
- * @brief ${DESCRIPTION}
- *
- * @author Arindam
- * @date 16/12/2024
- */
-
 #ifndef TOOLBOX_WINDOW_MANAGEMENT_HPP
 #define TOOLBOX_WINDOW_MANAGEMENT_HPP
 
-#include <string>
 #include "config.hpp"
-
+#include <string>
 
 namespace window_management
 {

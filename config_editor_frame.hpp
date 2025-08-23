@@ -1,16 +1,7 @@
-/**
- * @file config_editor_frame.hpp
- * @brief ${DESCRIPTION}
- *
- * @author Arindam
- * @date 19/12/2024
- */
-
 #ifndef TOOLBOX_CONFIG_EDITOR_FRAME_HPP
 #define TOOLBOX_CONFIG_EDITOR_FRAME_HPP
 
 #include <QWidget>
-
 
 QT_BEGIN_NAMESPACE
 namespace Ui

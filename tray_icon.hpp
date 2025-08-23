@@ -1,11 +1,3 @@
-/**
- * @file tray_icon.hpp
- * @brief ${DESCRIPTION}
- *
- * @author Arindam
- * @date 17/12/2024
- */
-
 #ifndef TOOLBOX_TRAY_ICON_HPP
 #define TOOLBOX_TRAY_ICON_HPP
 
@@ -20,7 +12,6 @@
 #include <QPainter>
 #include <QIcon>
 #include <QMessageBox>
-
 
 namespace tray_icon
 {

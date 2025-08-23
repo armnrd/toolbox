@@ -1,11 +1,3 @@
-/**
- * @file hacks_dpi_scaling.cpp
- * @brief ${DESCRIPTION}
- *
- * @author Arindam
- * @date 27/01/2025
- */
-
 #include "hacks_dpi_scaling.hpp"
 #include <memory>
 #include <cassert>
@@ -92,7 +84,6 @@ hacks_dpi_scaling::DPIScalingInfo hacks_dpi_scaling::get_dpi_scaling_info(LUID a
 
     return dpi_info;
 }
-
 
 bool hacks_dpi_scaling::set_dpi_scaling(LUID adapter_id, UINT32 source_id, UINT32 dpi_percent_to_set)
 {
