@@ -14,12 +14,12 @@
 #include <fstream>
 #include <format>
 #include <QDebug>
-#include <yaml-cpp/yaml.h>
+#include <nlohmann/json.hpp>
 
 
 namespace config
 {
-    typedef YAML::Node Config;
+    typedef nlohmann::json Config;
 
     Config *config_from_file(const std::string filename);
 

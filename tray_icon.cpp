@@ -44,7 +44,7 @@ tray_icon::TrayIcon::TrayIcon(Toolbox *app, config::Config *config) : QSystemTra
     setIcon(icon_from_emoji("🛠"));
 
     // Create a context menu for the tray icon
-    QMenu *menu = new QMenu();
+    auto menu = new QMenu();
 
     // Add actions to the menu
     QAction *menu_settings = new QAction("Settings...", menu);

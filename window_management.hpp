@@ -10,7 +10,7 @@
 #define TOOLBOX_WINDOW_MANAGEMENT_HPP
 
 #include <string>
-#include <yaml-cpp/yaml.h>
+#include "config.hpp"
 
 
 namespace window_management

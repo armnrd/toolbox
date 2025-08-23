@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     try {
         auto app = new Toolbox(argc, argv);
 
-        auto config = config::config_from_file("config.yml");
+        auto config = config::config_from_file("config.json");
 
         auto hotkey_factory = new hotkeys::Factory();
         hotkey_factory->set_keymap(hotkeys::keymap_from_config(config), app);

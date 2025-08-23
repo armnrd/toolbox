@@ -148,10 +148,10 @@ hotkeys::KeyMap *hotkeys::keymap_from_config(config::Config *config)
 
     // Use iterators to iterate over Window management key combinations
     for (auto it = (*config)["hotkeys"]["window"].begin(); it != (*config)["hotkeys"]["window"].end(); ++it) {
-        for (auto jt = it->second.begin(); jt != it->second.end(); ++jt) {
-            auto function_name = std::format("window_management::{}_{}", it->first.as<std::string>(), jt->first.as<std::string>());
+        for (auto jt = it.value().begin(); jt != it.value().end(); ++jt) {
+            auto function_name = std::format("window_management::{}_{}", it.key(), jt.key());
             // TODO error handling
-            key_map->insert({jt->second.as<std::string>(), function_map[function_name]});
+            key_map->insert({jt.value(), function_map[function_name]});
         }
     }
 
