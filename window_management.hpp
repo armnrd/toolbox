@@ -1,10 +1,7 @@
 #ifndef TOOLBOX_WINDOW_MANAGEMENT_HPP
 #define TOOLBOX_WINDOW_MANAGEMENT_HPP
 
-#include "config.hpp"
-#include <string>
-
-namespace window_management
+namespace toolbox::window_management
 {
     void action_minimize();
 
@@ -51,6 +48,6 @@ namespace window_management
     void move_fast_down();
 
     void move_slow_down();
-};
+}; // namespace toolbox::window_management
 
-#endif //TOOLBOX_WINDOW_MANAGEMENT_HPP
+#endif // TOOLBOX_WINDOW_MANAGEMENT_HPP

@@ -1,12 +1,12 @@
 #ifndef TOOLBOX_HACKS_HPP
 #define TOOLBOX_HACKS_HPP
 
-#include <windows.h>
 #include <QDebug>
+#include <windows.h>
 
-namespace hacks
+namespace toolbox::hacks
 {
     void set_display_scaling(int scaling_percentage, int display_index);
 }
 
-#endif //TOOLBOX_HACKS_HPP
+#endif // TOOLBOX_HACKS_HPP

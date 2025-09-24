@@ -1,26 +1,18 @@
 #ifndef TOOLBOX_TRAY_ICON_HPP
 #define TOOLBOX_TRAY_ICON_HPP
 
-#include "toolbox.hpp"
 #include "config.hpp"
 #include <QApplication>
-#include <QStyle>
 #include <QSystemTrayIcon>
-#include <QMenu>
-#include <QAction>
-#include <QPixmap>
-#include <QPainter>
-#include <QIcon>
-#include <QMessageBox>
 
-namespace tray_icon
+namespace toolbox::tray_icon
 {
     class TrayIcon : public QSystemTrayIcon
     {
     Q_OBJECT
 
     public:
-        TrayIcon(Toolbox *app, config::Config *config);
+        TrayIcon(QApplication *app, config::Config *config);
 
         ~TrayIcon() override;
 
@@ -37,8 +29,26 @@ namespace tray_icon
 //        void load_file(const QString &file_path);
 
     private:
+        QApplication *app;
+        config::Config *config;
+    };
 
-        Toolbox *app;
+    class AppTrayIcon : public QSystemTrayIcon
+    {
+        Q_OBJECT
+
+        public:
+        AppTrayIcon(QApplication *app, config::Config *config);
+
+        ~AppTrayIcon() override;
+
+    public slots:
+
+    private slots:
+        void restore_app_window();
+
+    private:
+        QApplication *app;
         config::Config *config;
     };
 }

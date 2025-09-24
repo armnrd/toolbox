@@ -1,12 +1,28 @@
 #ifndef TOOLBOX_TOOLBOX_HPP
 #define TOOLBOX_TOOLBOX_HPP
 
+#include "config.hpp"
+#include "tray_icon.hpp"
+#include "hotkeys.hpp"
+#include "workspaces.hpp"
 #include <QApplication>
 
-class Toolbox : public QApplication {
-    // just holds information that needs to be passed around the various parts
-public:
-    Toolbox(int &argc, char **argv) : QApplication(argc, argv) {}
-};
+
+namespace toolbox
+{
+    // Just holds information that needs to be passed around the various parts.
+    class Toolbox : public QApplication
+    {
+    public:
+        Toolbox(int &argc, char **argv);
+        ~Toolbox() override;
+        
+    private:
+        config::Config *config;
+        tray_icon::TrayIcon *tray_icon;
+        hotkeys::Hotkeys *hotkeys;
+        workspaces::Workspaces *workspaces;
+    };
+}
 
 #endif //TOOLBOX_TOOLBOX_HPP

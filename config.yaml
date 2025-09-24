@@ -1,0 +1,181 @@
+hotkeys:
+  window:
+    action:
+      minimize: meta+minus
+      toggle_maximize: ctrl+meta+alt+return
+      close: meta+esc
+      resize: ctrl+meta+alt+comma
+
+    position:
+      centre: ctrl+meta+alt+period
+      lower_screen: ctrl+meta+alt+M
+      upper_screen: ctrl+meta+alt+U
+      right_middle: ctrl+meta+alt+3
+      top_right: ctrl+meta+alt+4
+      top_middle: ctrl+meta+alt+5
+      top_left: ctrl+meta+alt+6
+      left_middle: ctrl+meta+alt+7
+      bottom_left: ctrl+meta+alt+8
+      bottom_middle: ctrl+meta+alt+9
+      bottom_right: ctrl+meta+alt+0
+
+    move:
+      fast_left: ctrl+meta+alt+left
+      slow_left: shift+ctrl+meta+alt+left
+      fast_right: ctrl+meta+alt+right
+      slow_right: shift+ctrl+meta+alt+right
+      fast_up: ctrl+meta+alt+up
+      slow_up: shift+ctrl+meta+alt+up
+      fast_down: ctrl+meta+alt+down
+      slow_down: shift+ctrl+meta+alt+down
+
+workspaces:
+  base:
+    Directory Opus:
+      location: C:\Packages\DOpus
+      executable: dopus.exe
+      args: NOAUTOLISTER STARTUP
+      position:
+      hide:
+
+    Flow Launcher:
+      location: C:\Users\Arindam\AppData\Local\FlowLauncher\app-1.19.5
+      executable: Flow.Launcher.exe
+      args:
+      position:
+      hide:
+
+    Everything:
+      location: C:\Packages\Everything
+      executable: Everything.exe
+      args: -startup
+      position:
+      hide:
+
+    Obsidian:
+      location: C:\Packages\Obsidian
+      executable: Obsidian.exe
+      args:
+      position:
+      hide:
+
+    4t Tray Minimizer:
+      location: C:\Packages\4tMinimizer
+      executable: 4t-min.exe
+      args: -tray
+      position:
+      hide:
+
+    Greenshot:
+      location: C:\Packages\Greenshot
+      executable: Greenshot.exe
+      args:
+      position:
+      hide:
+
+    CopyQ:
+      location: C:\Packages\CopyQ
+      executable: copyq.exe
+      args:
+      position:
+      hide:
+
+    WinCompose:
+      location: C:\Packages\WinCompose
+      executable: wincompose.exe
+      args:
+      position:
+      hide:
+
+    keynavish:
+      location: C:\Packages\keynavish
+      executable: keynavish-v1.7.0-x86_64.exe
+      args:
+      position:
+      hide:
+
+    PowerToys:
+      location: C:\Packages\PowerToys
+      executable: PowerToys.exe
+      args:
+      position:
+      hide:
+
+    Dropbox:
+      location: C:\Program Files (x86)\Dropbox\Client
+      executable: Dropbox.exe
+      args:
+      position:
+      hide:
+
+#    Claude:
+#      location: C:\Users\Arindam\AppData\Local\AnthropicClaude
+#      executable: claude.exe
+#      args:
+#      position:
+#      hide:
+
+#    Windows Terminal:
+#      location: C:\Users\Arindam\AppData\Local\Microsoft\WindowsApps
+#      executable: wt.exe
+#      args:
+#      position: bottom-centre
+#      hide: ctrl+meta+comma
+#
+    AgendaDashboard:
+      location: C:\Users\Arindam\Works\agenda-dashboard\bin\Release\net8.0-windows
+      executable: AgendaDashboard.exe
+      args:
+      position:
+      hide:
+
+    Typist:
+      location: C:\Users\Arindam\Works\typist\bin\Release\net8.0-windows
+      executable: Typist.exe
+      args:
+      position:
+      hide:
+
+    DesktopInfo64:
+      location: C:\Packages\DesktopInfo
+      executable: DesktopInfo64.exe
+      args:
+      position:
+      hide:
+
+    Todoist:
+      location: C:\Users\Arindam\AppData\Local\Programs\todoist
+      executable: Todoist.exe
+      args:
+      position:
+      hide: close
+
+    Telegram:
+      location: C:\Packages\Telegram
+      executable: Telegram.exe
+      args:
+      position:
+      hide: close
+
+    Signal:
+      location: C:\Users\Arindam\AppData\Local\Programs\signal-desktop
+      executable: Signal.exe
+      args:
+      position:
+      hide: close
+
+    Nearby Share:
+      location: C:\Program Files\Google\NearbyShare
+      executable: nearby_share.exe
+      args:
+      position:
+      hide: close
+
+    LogiTune:
+      location: C:\Program Files\Logitech\LogiTune
+      executable: LogiTune.exe
+      args:
+      position:
+      hide: close
+
+  Profile 1:

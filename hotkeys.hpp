@@ -1,16 +1,14 @@
 #ifndef TOOLBOX_HOTKEYS_HPP
 #define TOOLBOX_HOTKEYS_HPP
 
-#include "config.hpp"
-#include "window_management.hpp"
+#include <QAbstractNativeEventFilter>
+#include <QGuiApplication>
+#include <functional>
 #include <map>
 #include <string>
-#include <functional>
-#include <QApplication>
-#include <QAbstractNativeEventFilter>
-#include <windows.h>
+#include "config.hpp"
 
-namespace hotkeys
+namespace toolbox::hotkeys
 {
     typedef std::map<std::string, std::function<void()>> KeyMap;
     typedef std::map<unsigned int, std::function<void()>> IDMap;
@@ -29,21 +27,21 @@ namespace hotkeys
         // (key combination, (function, hotkey id)
         KeyMap *key_map;
         IDMap *id_map;
-        unsigned int keycode_from_description(std::string);
-        unsigned int modifiers_from_description(std::string);
     };
 
-    class Factory
+    class Hotkeys
     {
     public:
-        void set_keymap(KeyMap *key_map, QApplication *app);
+        Hotkeys(QGuiApplication *app, config::Config *config);
+        void register_hotkeys();
+        void unregister_hotkeys();
+        // TODO: individual add and remove functions
 
     private:
+        QGuiApplication *app = nullptr;
         KeyMap *key_map = nullptr;
         KeyMapEventFilter *key_map_event_filter = nullptr;
     };
+} // namespace toolbox::hotkeys
 
-    KeyMap *keymap_from_config(config::Config *config);
-}
-
-#endif //TOOLBOX_HOTKEYS_HPP
+#endif // TOOLBOX_HOTKEYS_HPP

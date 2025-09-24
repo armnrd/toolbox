@@ -1,28 +1,32 @@
 #include "config.hpp"
-#include "toolbox.hpp"
 
-// Function to load the JSON config file into the Toolbox object
-config::Config *config::config_from_file(const std::string filename)
+namespace toolbox::config
 {
-    // TODO error handling
-    qDebug() << "Loading config from file:" << QString::fromStdString(filename);
-    return new Config(Config::parse(std::ifstream(filename)));
-}
-
-// Function to save the Config struct inside the Toolbox object back into a JSON file
-void config::config_to_file(config::Config *config, const std::string filename)
-{
-    std::ofstream fout(filename);
-    if (fout.is_open()) {
-        fout << config->dump(4);
-        fout.close();
-        qDebug() << std::format("JSON config written to {}.", filename);
-    } else {
-        qDebug() << std::format("Failed to open {} for writing JSON config to.", filename);
+    // Function to load the JSON config file into the Toolbox object
+    Config *config_from_file(const std::string filename)
+    {
+        // TODO error handling
+        qDebug() << "Loading config from file:" << QString::fromStdString(filename);
+        return new Config(YAML::LoadFile(filename));
     }
-}
 
-void config::show_editor(config::Config *config)
-{
-    // TODO show editor
-}
+    // Function to save the Config struct inside the Toolbox object back into a YAML file
+    void config_to_file(Config *config, const std::string filename)
+    {
+        std::ofstream fout(filename);
+        if (fout.is_open())
+        {
+            fout << *config;
+            fout.close();
+            qDebug() << std::format("YAML config written to {}.", filename);
+        } else
+        {
+            qDebug() << std::format("Failed to open {} for writing YAML config to.", filename);
+        }
+    }
+
+    void show_editor(Config *config)
+    {
+        // TODO show editor
+    }
+} // namespace toolbox::config
