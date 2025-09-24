@@ -4,7 +4,7 @@
 #include "config.hpp"
 #include "tray_icon.hpp"
 #include "hotkeys.hpp"
-#include "workspaces.hpp"
+// #include "workspaces.hpp"
 #include <QApplication>
 
 
@@ -21,7 +21,7 @@ namespace toolbox
         config::Config *config;
         tray_icon::TrayIcon *tray_icon;
         hotkeys::Hotkeys *hotkeys;
-        workspaces::Workspaces *workspaces;
+        // workspaces::Workspaces *workspaces;
     };
 }
 

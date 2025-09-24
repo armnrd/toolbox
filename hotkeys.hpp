@@ -2,7 +2,7 @@
 #define TOOLBOX_HOTKEYS_HPP
 
 #include <QAbstractNativeEventFilter>
-#include <QGuiApplication>
+#include <QApplication>
 #include <functional>
 #include <map>
 #include <string>
@@ -32,13 +32,13 @@ namespace toolbox::hotkeys
     class Hotkeys
     {
     public:
-        Hotkeys(QGuiApplication *app, config::Config *config);
+        Hotkeys(QApplication *app, config::Config *config);
         void register_hotkeys();
         void unregister_hotkeys();
         // TODO: individual add and remove functions
 
     private:
-        QGuiApplication *app = nullptr;
+        QApplication *app = nullptr;
         KeyMap *key_map = nullptr;
         KeyMapEventFilter *key_map_event_filter = nullptr;
     };

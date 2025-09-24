@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.2)
+cmake_path(CONVERT $ENV{USERPROFILE} TO_CMAKE_PATH_LIST USERPROFILE_PATH)
+set(CMAKE_TOOLCHAIN_FILE "${USERPROFILE_PATH}/.vcpkg-clion/scripts/buildsystems/vcpkg.cmake")
+list(APPEND CMAKE_PREFIX_PATH "C:/Packages/Qt/6.9.2/msvc2022_64")
+
 project(toolbox VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -7,11 +11,6 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-include(FetchContent)
-#set(CMAKE_TOOLCHAIN_FILE "C:/Users/biswas02/.vcpkg-clion/scripts/buildsystems/vcpkg.cmake")
-
-list(APPEND CMAKE_PREFIX_PATH "C:/Packages/Qt/6.9.2/msvc2022_64")
-
 find_package(Qt6 COMPONENTS REQUIRED
         Core
         Quick
@@ -19,12 +18,7 @@ find_package(Qt6 COMPONENTS REQUIRED
         Widgets
 )
 
-FetchContent_Declare(
-        yaml-cpp
-        GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-        GIT_TAG 0.8.0
-)
-FetchContent_MakeAvailable(yaml-cpp)
+find_package(yaml-cpp CONFIG REQUIRED)
 
 set(TOOLBOX_RUNTIME_FILES
         config.yaml
@@ -47,8 +41,8 @@ set(TOOLBOX_SOURCES
         hotkeys.hpp
         window_management.cpp
         window_management.hpp
-        workspaces.cpp
-        workspaces.hpp
+#        workspaces.cpp
+#        workspaces.hpp
 
         #        config_editor_frame.cpp
         #        config_editor_frame.hpp
@@ -59,7 +53,7 @@ set(TOOLBOX_SOURCES
         #        hacks.hpp
 )
 
-qt_standard_project_setup(REQUIRES 6.9.2)
+qt_standard_project_setup(REQUIRES 6.9.1)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     qt_add_executable(toolbox WIN32 ${TOOLBOX_SOURCES})

@@ -201,7 +201,7 @@ namespace toolbox::hotkeys
      * @param app - reference to main application; key map will be installed on this
      * @note placeholder
      */
-    Hotkeys::Hotkeys(QGuiApplication *app, config::Config *config)
+    Hotkeys::Hotkeys(QApplication *app, config::Config *config)
     {
         this->app = app;
         // Get key map from config
