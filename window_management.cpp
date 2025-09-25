@@ -61,7 +61,7 @@ static const long FAST_DISTANCE = 50, SLOW_DISTANCE = 10;
 static std::tuple<HWND, RECT, long, long> foreground_window_info()
 {
     // Get the handle to the currently focused window
-    HWND window_handle = GetForegroundWindow();
+    auto window_handle = GetForegroundWindow();
     if (!window_handle)
     {
         qDebug() << "Error: No foreground window found!";
@@ -606,4 +606,4 @@ namespace toolbox::window_management
     {
         move_down(SLOW_DISTANCE);
     }
-} // namespace toolbox::window_management
+}

@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.12)
+set(ENV{VCPKG_FEATURE_FLAGS} "manifests,versions")
 cmake_path(CONVERT $ENV{USERPROFILE} TO_CMAKE_PATH_LIST USERPROFILE_PATH)
 set(CMAKE_TOOLCHAIN_FILE "${USERPROFILE_PATH}/.vcpkg-clion/scripts/buildsystems/vcpkg.cmake")
-list(APPEND CMAKE_PREFIX_PATH "C:/Packages/Qt/6.9.2/msvc2022_64")
+list(APPEND CMAKE_PREFIX_PATH "C:/Packages/Qt/6.9.1/msvc2022_64")
 
 project(toolbox VERSION 0.1 LANGUAGES CXX)
 
@@ -35,25 +36,24 @@ set(TOOLBOX_SOURCES
         toolbox.hpp
         config.cpp
         config.hpp
-        tray_icon.cpp
-        tray_icon.hpp
+        tray.cpp
+        tray.hpp
         hotkeys.cpp
         hotkeys.hpp
         window_management.cpp
         window_management.hpp
-#        workspaces.cpp
-#        workspaces.hpp
-
-        #        config_editor_frame.cpp
-        #        config_editor_frame.hpp
-        #        config_editor_frame.ui
-        #        hacks_dpi_scaling.cpp
-        #        hacks_dpi_scaling.hpp
-        #        hacks.cpp
-        #        hacks.hpp
+        workspaces.cpp
+        workspaces.hpp
+#        config_editor_frame.cpp
+#        config_editor_frame.hpp
+#        config_editor_frame.ui
+#        hacks_dpi_scaling.cpp
+#        hacks_dpi_scaling.hpp
+#        hacks.cpp
+#        hacks.hpp
 )
 
-qt_standard_project_setup(REQUIRES 6.9.1)
+qt_standard_project_setup(REQUIRES 6.9)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     qt_add_executable(toolbox WIN32 ${TOOLBOX_SOURCES})
@@ -61,12 +61,12 @@ else ()
     qt_add_executable(toolbox ${TOOLBOX_SOURCES}) # TODO: find correct method for debugging
 endif ()
 
-qt_add_qml_module(toolbox
-        URI toolbox
-        VERSION 1.0
-        QML_FILES
-        WorkspacesDashboard.qml
-)
+#qt_add_qml_module(toolbox
+#        URI toolbox
+#        VERSION 1.0
+#        QML_FILES
+#        WorkspacesDashboard.qml
+#)
 
 target_link_libraries(toolbox PRIVATE
         Qt::Core

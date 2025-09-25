@@ -2,9 +2,9 @@
 #define TOOLBOX_TOOLBOX_HPP
 
 #include "config.hpp"
-#include "tray_icon.hpp"
 #include "hotkeys.hpp"
-// #include "workspaces.hpp"
+#include "tray.hpp"
+#include "workspaces.hpp"
 #include <QApplication>
 
 
@@ -19,9 +19,9 @@ namespace toolbox
         
     private:
         config::Config *config;
-        tray_icon::TrayIcon *tray_icon;
+        tray::TrayIcon *tray_icon;
         hotkeys::Hotkeys *hotkeys;
-        // workspaces::Workspaces *workspaces;
+        workspaces::Workspaces *workspaces;
     };
 }
 

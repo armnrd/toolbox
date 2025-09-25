@@ -5,7 +5,7 @@
 #include <QApplication>
 #include <QSystemTrayIcon>
 
-namespace toolbox::tray_icon
+namespace toolbox::tray
 {
     class TrayIcon : public QSystemTrayIcon
     {
@@ -13,8 +13,6 @@ namespace toolbox::tray_icon
 
     public:
         TrayIcon(QApplication *app, config::Config *config);
-
-        ~TrayIcon() override;
 
     public slots:
 
@@ -38,19 +36,21 @@ namespace toolbox::tray_icon
         Q_OBJECT
 
         public:
-        AppTrayIcon(QApplication *app, config::Config *config);
+        AppTrayIcon(HWND app_hwnd, QIcon app_icon);
 
-        ~AppTrayIcon() override;
+        ~AppTrayIcon() = default;
 
     public slots:
-
-    private slots:
-        void restore_app_window();
+        void toggle_app_window();
+        void hide_app_window();
+        void unhide_app_window();
 
     private:
-        QApplication *app;
-        config::Config *config;
+        HWND app_hwnd;
+        QIcon app_icon;
     };
+
+    AppTrayIcon* create_app_tray_icon(HWND app_hwnd);
 }
 
 #endif //TOOLBOX_TRAY_ICON_HPP

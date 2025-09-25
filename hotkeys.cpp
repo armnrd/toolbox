@@ -129,71 +129,82 @@ static unsigned int modifiers_from_description(std::string description)
     return modifiers;
 }
 
-namespace toolbox::hotkeys
+static KeyMap *keymap_from_config(toolbox::config::Config *config)
 {
-    static KeyMap *keymap_from_config(config::Config *config)
+    auto key_map = new KeyMap();
+
+    // Use iterators to iterate over Window management key combinations
+    for (auto it = (*config)["hotkeys"]["window"].begin(); it != (*config)["hotkeys"]["window"].end(); ++it)
     {
-        auto key_map = new KeyMap();
-
-        // Use iterators to iterate over Window management key combinations
-        for (auto it = (*config)["hotkeys"]["window"].begin(); it != (*config)["hotkeys"]["window"].end(); ++it)
+        for (auto jt = it->second.begin(); jt != it->second.end(); ++jt)
         {
-            for (auto jt = it->second.begin(); jt != it->second.end(); ++jt)
-            {
-                auto function_name = std::format("window_management::{}_{}", it->first.as<std::string>(),
-                                                 jt->first.as<std::string>());
-                // TODO error handling
-                key_map->insert({jt->second.as<std::string>(), function_map[function_name]});
-            }
-        }
-
-        return key_map;
-    }
-
-    KeyMapEventFilter::KeyMapEventFilter(KeyMap *key_map)
-    {
-        this->key_map = key_map;
-        this->id_map = new IDMap();
-        unsigned int id = 0;
-        for (auto &pair: *key_map)
-        {
-            auto key_code = keycode_from_description(pair.first);
-            auto modifiers = modifiers_from_description(pair.first);
-            if (RegisterHotKey(nullptr, id, modifiers, key_code))
-            {
-                id_map->insert({id, pair.second});
-                id++;
-                qDebug() << std::format("Combination {} registered successfully: {:#X} {:#X}", pair.first, key_code,
-                                        modifiers);
-            } else
-            {
-                qDebug() << std::format("Failed to register combination {}: {:#X} {:#X}", pair.first, key_code,
-                                        modifiers);
-            }
+            auto function_name = std::format("window_management::{}_{}", it->first.as<std::string>(),
+                                             jt->first.as<std::string>());
+            // TODO error handling
+            key_map->insert({jt->second.as<std::string>(), function_map[function_name]});
         }
     }
 
-    KeyMapEventFilter::~KeyMapEventFilter()
-    {
-        // TODO placeholder
-    }
+    return key_map;
+}
 
-    // Override native event filter to capture the WM_HOTKEY message
-    bool KeyMapEventFilter::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
+KeyMapEventFilter::~KeyMapEventFilter()
+{
+    // TODO placeholder
+    delete id_map;
+}
+
+void KeyMapEventFilter::register_keymap(KeyMap *key_map)
+{
+    for (auto &pair: *key_map)
     {
-        if (eventType == "windows_generic_MSG" || eventType == "windows_dispatcher_MSG")
+        auto key_code = keycode_from_description(pair.first);
+        auto modifiers = modifiers_from_description(pair.first);
+        if (RegisterHotKey(nullptr, next_id, modifiers, key_code))
         {
-            MSG *msg = static_cast<MSG *>(message);
-            if (msg->message == WM_HOTKEY)
+            id_map->insert({next_id, pair});
+            next_id++;
+            qDebug() << std::format("Combination {} registered successfully: {:#X} {:#X}", pair.first, key_code,
+                                    modifiers);
+        } else
+        {
+            qDebug() << std::format("Failed to register combination {}: {:#X} {:#X}", pair.first, key_code,
+                                    modifiers);
+        }
+    }
+}
+
+void KeyMapEventFilter::register_hotkey(std::string description, std::function<void()> action)
+{
+    std::logic_error("Not implemented");
+}
+
+void KeyMapEventFilter::unregister_hotkey(std::string description)
+{
+    std::logic_error("Not implemented");
+}
+
+// Override native event filter to capture the WM_HOTKEY message
+bool KeyMapEventFilter::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
+{
+    if (eventType == "windows_generic_MSG" || eventType == "windows_dispatcher_MSG")
+    {
+        MSG *msg = static_cast<MSG *>(message);
+        if (msg->message == WM_HOTKEY)
+        {
+            auto hotkey_id = msg->wParam; // ID of the hotkey
+            if (hotkey_id < id_map->size())
             {
-                auto hotkey_id = msg->wParam; // ID of the hotkey
-                (*id_map)[hotkey_id]();
+                (*id_map)[hotkey_id].second();
                 return true;
             }
         }
-        return false;
     }
+    return false;
+}
 
+namespace toolbox::hotkeys
+{
     /**
      * @brief  Sets up hotkeys.
      *
@@ -201,25 +212,31 @@ namespace toolbox::hotkeys
      * @param app - reference to main application; key map will be installed on this
      * @note placeholder
      */
-    Hotkeys::Hotkeys(QApplication *app, config::Config *config)
+    Hotkeys::Hotkeys(QApplication *app)
     {
-        this->app = app;
-        // Get key map from config
-        key_map = keymap_from_config(config);
-        key_map_event_filter = new KeyMapEventFilter(key_map);
+        keymap_event_filter = new KeyMapEventFilter();
+        app->installNativeEventFilter(keymap_event_filter);
     }
 
-    void Hotkeys::register_hotkeys()
+    void Hotkeys::add_hotkeys_from_config(config::Config *config)
     {
-        app->installNativeEventFilter(key_map_event_filter);
+        keymap_event_filter->register_keymap(keymap_from_config(config));
     }
 
-    void Hotkeys::unregister_hotkeys()
+    void Hotkeys::add_hotkey(std::string description, std::function<void()> action)
     {
-        // TODO: If a KeyMapEventFilter was already installed on app, remove it
-        if (key_map_event_filter)
-        {
-            app->removeNativeEventFilter(key_map_event_filter);
-        }
+        keymap_event_filter->register_hotkey(description, action);
     }
-} // namespace toolbox::hotkeys
+
+    void Hotkeys::remove_hotkey(std::string description)
+    {
+        keymap_event_filter->unregister_hotkey(description);
+    }
+
+    void Hotkeys::reset_hotkeys()
+    {
+        app->removeNativeEventFilter(keymap_event_filter);
+        delete keymap_event_filter;
+        keymap_event_filter = new KeyMapEventFilter();
+    }
+}

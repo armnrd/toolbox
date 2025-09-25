@@ -8,40 +8,48 @@
 #include <string>
 #include "config.hpp"
 
+// (hotkey description, action)
+typedef std::map<std::string, std::function<void()>> KeyMap;
+// (hotkey id, (hotkey description, action))
+typedef std::map<unsigned int, std::pair<std::string, std::function<void()>>> IDMap;
+
+class KeyMapEventFilter : public QObject, public QAbstractNativeEventFilter
+{
+public:
+    KeyMapEventFilter() = default;
+
+    ~KeyMapEventFilter() override;
+
+    void register_keymap(KeyMap *key_map);
+
+    void register_hotkey(std::string description, std::function<void()> action);
+
+    void unregister_hotkey(std::string description);
+
+    // Override native event filter to capture the WM_HOTKEY message
+    bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override;
+
+private:
+    // (hotkey id, action)
+    IDMap *id_map = new IDMap();
+    int next_id = 0;
+};
+
 namespace toolbox::hotkeys
 {
-    typedef std::map<std::string, std::function<void()>> KeyMap;
-    typedef std::map<unsigned int, std::function<void()>> IDMap;
-
-    class KeyMapEventFilter : public QObject, public QAbstractNativeEventFilter
-    {
-    public:
-        KeyMapEventFilter(std::map<std::string, std::function<void()>> *key_map);
-
-        ~KeyMapEventFilter();
-
-        // Override native event filter to capture the WM_HOTKEY message
-        bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override;
-
-    private:
-        // (key combination, (function, hotkey id)
-        KeyMap *key_map;
-        IDMap *id_map;
-    };
-
     class Hotkeys
     {
     public:
-        Hotkeys(QApplication *app, config::Config *config);
-        void register_hotkeys();
-        void unregister_hotkeys();
-        // TODO: individual add and remove functions
+        Hotkeys(QApplication *app);
+        void add_hotkeys_from_config(config::Config *config);
+        void add_hotkey(std::string description, std::function<void()> action);
+        void remove_hotkey(std::string description);
+        void reset_hotkeys();
 
     private:
         QApplication *app = nullptr;
-        KeyMap *key_map = nullptr;
-        KeyMapEventFilter *key_map_event_filter = nullptr;
+        KeyMapEventFilter *keymap_event_filter = nullptr;
     };
-} // namespace toolbox::hotkeys
+}
 
 #endif // TOOLBOX_HOTKEYS_HPP

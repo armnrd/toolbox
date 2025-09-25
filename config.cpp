@@ -29,4 +29,4 @@ namespace toolbox::config
     {
         // TODO show editor
     }
-} // namespace toolbox::config
+}

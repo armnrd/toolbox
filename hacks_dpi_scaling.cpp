@@ -323,4 +323,4 @@ namespace toolbox::hacks_dpi_scaling
     //         }
     //     }
     // }
-} // namespace toolbox::hacks_dpi_scaling
+}

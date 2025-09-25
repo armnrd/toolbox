@@ -33,4 +33,4 @@ namespace toolbox::hacks
             }
         }
     }
-} // namespace toolbox::hacks
+}

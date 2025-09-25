@@ -8,19 +8,20 @@ namespace toolbox
         config = config::config_from_file("config.yaml");
 
         // Set up tray icon
-        tray_icon = new tray_icon::TrayIcon(this, config);
+        tray_icon = new tray::TrayIcon(this, config);
         tray_icon->show();
         tray_icon->showMessage("Toolbox", "Running in the system tray.", QSystemTrayIcon::Information, 2000);
+        qDebug() << "Created tray icon.";
 
         // Set up hotkeys
-        hotkeys = new hotkeys::Hotkeys(this, config);
-        hotkeys->register_hotkeys();
-
+        hotkeys = new hotkeys::Hotkeys(this);
+        hotkeys->add_hotkeys_from_config(config);
+        qDebug() << "Registered hotkeys from config.";
 
         // Set up workspaces
-        // workspaces = new workspaces::Workspaces(this, config);
+        workspaces = new workspaces::Workspaces(this, config);
         // workspaces->launch_base_apps();
-        qDebug() << "Toolbox initialized: tray icon and hotkeys set up.";
+        // qDebug() << "Set up workspaces and launched base apps.";
     };
 
     Toolbox::~Toolbox() = default;
