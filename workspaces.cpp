@@ -167,7 +167,7 @@ namespace toolbox::workspaces
         // toggle window: ctrl+meta+comma
       }
 
-    Workspaces::Workspaces(QApplication *app, config::Config *config)
+    WorkspaceMgr::WorkspaceMgr(QApplication *app, config::Config *config)
     {
         auto base_workspace = map<string, App>{};
         for (auto it = (*config)["workspaces"]["base"].begin(); it != (*config)["workspaces"]["base"].end(); ++it)
@@ -178,12 +178,12 @@ namespace toolbox::workspaces
         spaces["base"] = base_workspace;
     }
 
-    Workspaces::~Workspaces()
+    WorkspaceMgr::~WorkspaceMgr()
     {
         // TODO save app lists to config on destruction
     }
 
-    void Workspaces::launch_base_apps()
+    void WorkspaceMgr::launch_base_apps()
     {
         for (auto pair: spaces["base"])
         {
@@ -198,38 +198,38 @@ namespace toolbox::workspaces
         }
     }
 
-    std::list<string> *Workspaces::get_base_app_list()
+    std::list<string> *WorkspaceMgr::get_base_app_list()
     {
         return nullptr;
     }
 
-    void Workspaces::add_app_to_base_list(const string &app_name)
+    void WorkspaceMgr::add_app_to_base_list(const string &app_name)
     {
         std::logic_error("Not implemented");
     }
 
-    void Workspaces::remove_app_from_base_list(const string &app_name)
+    void WorkspaceMgr::remove_app_from_base_list(const string &app_name)
     {
         std::logic_error("Not implemented");
     }
 
-    void Workspaces::launch_profile_apps(const string &profile_name)
+    void WorkspaceMgr::launch_profile_apps(const string &profile_name)
     {
         std::logic_error("Not implemented");
     }
 
-    std::list<string> *Workspaces::get_profile_app_list(const string &profile_name)
+    std::list<string> *WorkspaceMgr::get_profile_app_list(const string &profile_name)
     {
         std::logic_error("Not implemented");
         return nullptr;
     }
 
-    void Workspaces::add_app_to_profile_list(const string &profile_name, const string &app_name)
+    void WorkspaceMgr::add_app_to_profile_list(const string &profile_name, const string &app_name)
     {
         std::logic_error("Not implemented");
     }
 
-    void Workspaces::remove_app_from_profile_list(const string &profile_name, const string &app_name)
+    void WorkspaceMgr::remove_app_from_profile_list(const string &profile_name, const string &app_name)
     {
         std::logic_error("Not implemented");
     }

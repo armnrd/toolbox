@@ -9,12 +9,12 @@ namespace toolbox::workspaces
 {
     void launch_terminal();
 
-    class Workspaces
+    class WorkspaceMgr
     {
     public:
-        Workspaces(QApplication *app, config::Config *config);
+        WorkspaceMgr(QApplication *app, config::Config *config);
 
-        ~Workspaces();
+        ~WorkspaceMgr();
 
         void launch_base_apps();
 

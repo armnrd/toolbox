@@ -1,4 +1,4 @@
-#include "window_management.hpp"
+#include "windowmgr.hpp"
 #include <QDebug>
 #include <windows.h>
 
@@ -110,7 +110,7 @@ static std::tuple<HMONITOR, RECT, long, long> get_screen_info(HWND window_handle
     return {monitor_handle, screen_rect, screen_width, screen_height};
 }
 
-namespace toolbox::window_management
+namespace toolbox::windowmgr
 {
     void action_minimize()
     {
