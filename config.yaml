@@ -1,4 +1,4 @@
-hotkeys:
+keymap:
   window:
     action:
       minimize: meta+minus
