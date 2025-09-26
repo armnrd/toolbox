@@ -1,10 +1,10 @@
 keymap:
-  window:
+  windowmgr:
     action:
       minimize: meta+minus
       toggle_maximize: ctrl+meta+alt+return
       close: meta+esc
-      resize: ctrl+meta+alt+comma
+      resize: ctrl+meta+comma
 
     position:
       centre: ctrl+meta+alt+period
@@ -37,6 +37,7 @@ workspaces:
       args: NOAUTOLISTER STARTUP
       position: ~
       toggle window: ~
+      window identifier: ~
 
     Obsidian:
       location: C:\Program Files\Obsidian
@@ -44,6 +45,7 @@ workspaces:
       args: ~
       position: ~
       toggle window: ~
+      window identifier: ~
 
     Todoist:
       location: C:\Users\Arindam\AppData\Local\Programs\todoist
@@ -51,6 +53,7 @@ workspaces:
       args: ~
       position: ~
       toggle window: ~
+      window identifier: ~
 
     Greenshot:
       location: C:\Program Files\Greenshot
@@ -58,6 +61,7 @@ workspaces:
       args: ~
       position: ~
       toggle window: ~
+      window identifier: ~
 
     CopyQ:
       location: C:\Users\biswas02\AppData\Local\Programs\copyq
@@ -65,6 +69,7 @@ workspaces:
       args: ~
       position: ~
       toggle window: ~
+      window identifier: ~
 
     Everything:
       location: C:\Program Files\Everything
@@ -72,6 +77,7 @@ workspaces:
       args: -startup
       position: ~
       toggle window: ~
+      window identifier: ~
 
     PowerToys:
       location: C:\Packages\PowerToys
@@ -79,13 +85,15 @@ workspaces:
       args: ~
       position: ~
       toggle window: ~
+      window identifier: ~
 
     Windows Terminal:
-      location: C:\Program Files\WindowsApps\Microsoft.WindowsTerminal_1.22.12111.0_x64__8wekyb3d8bbwe
-      executable: WindowsTerminal.exe
+      location: C:\Users\biswas02\AppData\Local\Microsoft\WindowsApps
+      executable: wt.exe
       args: ~
-      position: bottom-centre
-      toggle window: ctrl+meta+comma
+      position: bottom_middle
+      toggle window: ctrl+meta+alt+comma
+      window identifier: WindowsTerminal.exe
 
     AgendaDashboard:
       location: C:\Users\Arindam\Works\agenda-dashboard\bin\Release\net8.0-windows
@@ -93,6 +101,7 @@ workspaces:
       args: ~
       position: ~
       toggle window: ~
+      window identifier: ~
 
     Typist:
       location: C:\Users\Arindam\Works\typist\bin\Release\net8.0-windows
@@ -100,6 +109,7 @@ workspaces:
       args: ~
       position: ~
       toggle window: ~
+      window identifier: ~
 
     LogiTune:
       location: C:\Program Files\Logitech\LogiTune
@@ -107,6 +117,7 @@ workspaces:
       args: ~
       position: ~
       toggle window: ~
+      window identifier: ~
     
     Dropbox:
       location: C:\Program Files\WindowsApps\DropboxInc.Dropbox_232.4.5988.0_x64__xbfy0k16fey96
@@ -114,40 +125,44 @@ workspaces:
       args: ~
       position: ~
       toggle window: ~
+      window identifier: ~
 
-  #    DesktopInfo64:
-  #      location: C:\Program Files\DesktopInfo
-  #      executable: DesktopInfo64.exe
-  #      args: ~
-  #      position: ~
-  #      toggle window: ~
-  
-  #    Telegram:
-  #      location: C:\Program Files\Telegram
-  #      executable: Telegram.exe
-  #      args: ~
-  #      position: ~
-  #      toggle window: close
-  
-  #    Signal:
-  #      location: C:\Users\Arindam\AppData\Local\Programs\signal-desktop
-  #      executable: Signal.exe
-  #      args: ~
-  #      position: ~
-  #      toggle window: close
-  
-  #    Nearby Share:
-  #      location: C:\Program Files\Google\NearbyShare
-  #      executable: nearby_share.exe
-  #      args: ~
-  #      position: ~
-  #      toggle window: close
-  
-  #    Claude:
-  #      location: C:\Users\Arindam\AppData\Local\AnthropicClaude
-  #      executable: claude.exe
-  #      args: ~
-  #      position: ~
-  #      toggle window: ~
+      #    DesktopInfo64:
+      #      location: C:\Program Files\DesktopInfo
+      #      executable: DesktopInfo64.exe
+      #      args: ~
+      #      position: ~
+      #      toggle window: ~
+      #      window identifier: ~
 
-  profile_1:
+      #    Telegram:
+      #      location: C:\Program Files\Telegram
+      #      executable: Telegram.exe
+      #      args: ~
+      #      position: ~
+      #      toggle window: close
+      #      window identifier: ~
+
+      #    Signal:
+      #      location: C:\Users\Arindam\AppData\Local\Programs\signal-desktop
+      #      executable: Signal.exe
+      #      args: ~
+      #      position: ~
+      #      toggle window: close
+      #      window identifier: ~
+
+      #    Nearby Share:
+      #      location: C:\Program Files\Google\NearbyShare
+      #      executable: nearby_share.exe
+      #      args: ~
+      #      position: ~
+      #      toggle window: close
+      #      window identifier: ~
+
+      #    Claude:
+      #      location: C:\Users\Arindam\AppData\Local\AnthropicClaude
+      #      executable: claude.exe
+      #      args: ~
+      #      position: ~
+      #      toggle window: ~
+      #      window identifier: ~

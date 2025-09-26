@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 set(ENV{VCPKG_FEATURE_FLAGS} "manifests,versions")
 cmake_path(CONVERT $ENV{USERPROFILE} TO_CMAKE_PATH_LIST USERPROFILE_PATH)
 set(CMAKE_TOOLCHAIN_FILE "${USERPROFILE_PATH}/.vcpkg-clion/scripts/buildsystems/vcpkg.cmake")
-list(APPEND CMAKE_PREFIX_PATH "C:/Packages/Qt/6.9.1/msvc2022_64")
+list(APPEND CMAKE_PREFIX_PATH "C:/Packages/Qt/6.9.2/msvc2022_64")
 
 project(toolbox VERSION 0.1 LANGUAGES CXX)
 
@@ -38,19 +38,12 @@ set(TOOLBOX_SOURCES
         config.hpp
         tray.cpp
         tray.hpp
-        hotkeys.cpp
-        hotkeys.hpp
-        window_management.cpp
-        window_management.hpp
+        keymap.cpp
+        keymap.hpp
+        windowmgr.cpp
+        windowmgr.hpp
         workspaces.cpp
         workspaces.hpp
-#        config_editor_frame.cpp
-#        config_editor_frame.hpp
-#        config_editor_frame.ui
-#        hacks_dpi_scaling.cpp
-#        hacks_dpi_scaling.hpp
-#        hacks.cpp
-#        hacks.hpp
 )
 
 qt_standard_project_setup(REQUIRES 6.9)
@@ -76,29 +69,23 @@ target_link_libraries(toolbox PRIVATE
         yaml-cpp::yaml-cpp
 )
 
-include(GNUInstallDirs)
-install(TARGETS toolbox
-        BUNDLE DESTINATION .
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
-
 # Target for copying configuration, etc. files to the build directory
-add_custom_target(copy_runtime_files
+add_custom_target(resource_files
+        COMMAND ${CMAKE_COMMAND} -E echo_append "Copying resource files... "
         COMMAND ${CMAKE_COMMAND} -E copy ${TOOLBOX_RUNTIME_FILES} ${CMAKE_CURRENT_BINARY_DIR}
+        COMMAND ${CMAKE_COMMAND} -E echo "done."
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMENT "Copying runtime files"
 )
 
-add_dependencies(toolbox copy_runtime_files) # Make sure runtime files are copied while building
+add_dependencies(toolbox resource_files) # Make sure runtime files are copied while building
 
 # Deployment for Windows to include all necessary DLLs and plugins
-set(DEPLOYQT_FLAGS
+set(WINDEPLOYQT_FLAGS
         $<$<NOT:$<CONFIG:Debug>>:--release>
         --no-translations
         --no-compiler-runtime
 )
 add_custom_command(TARGET toolbox POST_BUILD
-        COMMAND ${WINDEPLOYQT_EXECUTABLE} ${DEPLOYQT_FLAGS} $<TARGET_FILE:toolbox>
-        COMMENT "Running windeployqt..."
+        COMMAND ${CMAKE_COMMAND} -E echo "Running windeployqt:"
+        COMMAND ${WINDEPLOYQT_EXECUTABLE} ${WINDEPLOYQT_FLAGS} $<TARGET_FILE:toolbox>
 )

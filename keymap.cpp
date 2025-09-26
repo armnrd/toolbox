@@ -1,6 +1,6 @@
 #include "keymap.hpp"
 #include <windows.h>
-#include "window_management.hpp"
+#include "windowmgr.hpp"
 
 static std::map<std::string, int> keycode_map = {
     {"A", 'A'},
@@ -84,29 +84,29 @@ static std::map<std::string, int> modifier_map = {
 
 // Map from function names to functions
 static std::map<std::string, std::function<void()> > function_map = {
-    {"window_management::action_minimize", toolbox::window_management::action_minimize},
-    {"window_management::action_toggle_maximize", toolbox::window_management::action_toggle_maximize},
-    {"window_management::action_close", toolbox::window_management::action_close},
-    {"window_management::action_resize", toolbox::window_management::action_resize},
-    {"window_management::position_centre", toolbox::window_management::position_centre},
-    {"window_management::position_lower_screen", toolbox::window_management::position_lower_screen},
-    {"window_management::position_upper_screen", toolbox::window_management::position_upper_screen},
-    {"window_management::position_right_middle", toolbox::window_management::position_right_middle},
-    {"window_management::position_top_right", toolbox::window_management::position_top_right},
-    {"window_management::position_top_middle", toolbox::window_management::position_top_middle},
-    {"window_management::position_top_left", toolbox::window_management::position_top_left},
-    {"window_management::position_left_middle", toolbox::window_management::position_left_middle},
-    {"window_management::position_bottom_left", toolbox::window_management::position_bottom_left},
-    {"window_management::position_bottom_middle", toolbox::window_management::position_bottom_middle},
-    {"window_management::position_bottom_right", toolbox::window_management::position_bottom_right},
-    {"window_management::move_fast_left", toolbox::window_management::move_fast_left},
-    {"window_management::move_slow_left", toolbox::window_management::move_slow_left},
-    {"window_management::move_fast_right", toolbox::window_management::move_fast_right},
-    {"window_management::move_slow_right", toolbox::window_management::move_slow_right},
-    {"window_management::move_fast_up", toolbox::window_management::move_fast_up},
-    {"window_management::move_slow_up", toolbox::window_management::move_slow_up},
-    {"window_management::move_fast_down", toolbox::window_management::move_fast_down},
-    {"window_management::move_slow_down", toolbox::window_management::move_slow_down}
+    {"action_minimize", toolbox::windowmgr::action_foreground_minimize},
+    {"action_toggle_maximize", toolbox::windowmgr::action_foreground_toggle_maximize},
+    {"action_close", toolbox::windowmgr::action_foreground_close},
+    {"action_resize", toolbox::windowmgr::action_foreground_resize},
+    {"position_centre", toolbox::windowmgr::position_foreground_centre},
+    {"position_lower_screen", toolbox::windowmgr::position_foreground_lower_screen},
+    {"position_upper_screen", toolbox::windowmgr::position_foreground_upper_screen},
+    {"position_right_middle", toolbox::windowmgr::position_foreground_right_middle},
+    {"position_top_right", toolbox::windowmgr::position_foreground_top_right},
+    {"position_top_middle", toolbox::windowmgr::position_foreground_top_middle},
+    {"position_top_left", toolbox::windowmgr::position_foreground_top_left},
+    {"position_left_middle", toolbox::windowmgr::position_foreground_left_middle},
+    {"position_bottom_left", toolbox::windowmgr::position_foreground_bottom_left},
+    {"position_bottom_middle", toolbox::windowmgr::position_foreground_bottom_middle},
+    {"position_bottom_right", toolbox::windowmgr::position_foreground_bottom_right},
+    {"move_fast_left", toolbox::windowmgr::move_foreground_fast_left},
+    {"move_slow_left", toolbox::windowmgr::move_foreground_slow_left},
+    {"move_fast_right", toolbox::windowmgr::move_foreground_fast_right},
+    {"move_slow_right", toolbox::windowmgr::move_foreground_slow_right},
+    {"move_fast_up", toolbox::windowmgr::move_foreground_fast_up},
+    {"move_slow_up", toolbox::windowmgr::move_foreground_slow_up},
+    {"move_fast_down", toolbox::windowmgr::move_foreground_fast_down},
+    {"move_slow_down", toolbox::windowmgr::move_foreground_slow_down}
 };
 
 static unsigned int keycode_from_description(std::string description)
@@ -137,13 +137,12 @@ static Keymap *keymap_from_config(toolbox::config::Config *config)
 {
     auto keymap = new Keymap();
 
-    // Use iterators to iterate over Window management keybinds
-    for (auto it = (*config)["keymap"]["window"].begin(); it != (*config)["keymap"]["window"].end(); ++it)
+    // Use iterators to iterate over window manager keybinds
+    for (auto it = (*config)["keymap"]["windowmgr"].begin(); it != (*config)["keymap"]["windowmgr"].end(); ++it)
     {
         for (auto jt = it->second.begin(); jt != it->second.end(); ++jt)
         {
-            auto function_name = std::format("window_management::{}_{}", it->first.as<std::string>(),
-                                             jt->first.as<std::string>());
+            auto function_name = std::format("{}_{}", it->first.as<std::string>(), jt->first.as<std::string>());
             // TODO error handling
             keymap->insert({jt->second.as<std::string>(), function_map[function_name]});
         }
@@ -162,7 +161,7 @@ bool KeymapEventFilter::nativeEventFilter(const QByteArray &eventType, void *mes
 {
     if (eventType == "windows_generic_MSG" || eventType == "windows_dispatcher_MSG")
     {
-        MSG *msg = static_cast<MSG *>(message);
+        auto *msg = static_cast<MSG *>(message);
         if (msg->message == WM_HOTKEY)
         {
             auto keybind_id = msg->wParam; // ID of the keybind
@@ -187,18 +186,18 @@ namespace toolbox::keymap
      */
     KeymapMgr::KeymapMgr(QApplication *app)
     {
-        keymap_event_filter = new KeymapEventFilter();
-        app->installNativeEventFilter(keymap_event_filter);
+        kmef = new KeymapEventFilter();
+        app->installNativeEventFilter(kmef);
     }
 
     void KeymapMgr::add_keybind(std::string description, std::function<void()> action)
     {
         auto keycode = keycode_from_description(description);
         auto modifiers = modifiers_from_description(description);
-        if (RegisterHotKey(nullptr, keymap_event_filter->_next_id, modifiers, keycode))
+        if (RegisterHotKey(nullptr, kmef->_next_id, modifiers, keycode))
         {
-            keymap_event_filter->_id_map->insert({keymap_event_filter->_next_id, {description, action}});
-            keymap_event_filter->_next_id++;
+            kmef->_id_map->insert({kmef->_next_id, {description, action}});
+            kmef->_next_id++;
             qDebug() << std::format("Keybind {} registered successfully: {:#X} {:#X}", description, keycode,
                                     modifiers);
         } else
@@ -219,8 +218,8 @@ namespace toolbox::keymap
 
     void KeymapMgr::remove_keybind(std::string description)
     {
-        // Iterate over pairs in keymap_event_filter._id_map and remove the one that matches description
-        for (auto it = keymap_event_filter->_id_map->begin(); it != keymap_event_filter->_id_map->end(); ++it)
+        // Iterate over pairs in kmef._id_map and remove the one that matches description
+        for (auto it = kmef->_id_map->begin(); it != kmef->_id_map->end(); ++it)
         {
             if (it->second.first == description)
             {
@@ -231,7 +230,7 @@ namespace toolbox::keymap
                 {
                     qDebug() << std::format("Failed to unregister keybind {}.", description);
                 }
-                keymap_event_filter->_id_map->erase(it);
+                kmef->_id_map->erase(it);
                 return;
             }
         }
@@ -240,7 +239,7 @@ namespace toolbox::keymap
     void KeymapMgr::remove_all_keybinds()
     {
         // Iterate over keymap_event_iflter._id_map and unregister each keybind
-        for (auto it = keymap_event_filter->_id_map->begin(); it != keymap_event_filter->_id_map->end(); ++it)
+        for (auto it = kmef->_id_map->begin(); it != kmef->_id_map->end(); ++it)
         {
             if (UnregisterHotKey(nullptr, it->first))
             {
@@ -250,8 +249,8 @@ namespace toolbox::keymap
                 qDebug() << std::format("Failed to unregister keybind {}.", it->second.first);
             }
         }
-        // Clear keymap_event_filter._id_map
-        keymap_event_filter->_id_map->clear();
-        keymap_event_filter->_next_id = 0;
+        // Clear kmef._id_map
+        kmef->_id_map->clear();
+        kmef->_next_id = 0;
     }
 }

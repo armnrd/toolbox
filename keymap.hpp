@@ -41,7 +41,7 @@ namespace toolbox::keymap
 
     private:
         QApplication *app = nullptr;
-        KeymapEventFilter *keymap_event_filter = nullptr;
+        KeymapEventFilter *kmef = nullptr;
     };
 }
 
