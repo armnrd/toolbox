@@ -27,7 +27,7 @@ static QString exe_path_from_hwnd(HWND hwnd)
 }
 
 // Extracts the large icon from an executable path
-static QIcon qicon_from_exe_path(const QString &exePath)
+static QIcon icon_from_exe_path(const QString &exePath)
 {
     HICON hIconLarge = nullptr;
     ExtractIconExW(reinterpret_cast<const wchar_t *>(exePath.utf16()), 0, &hIconLarge, nullptr, 1);
@@ -85,8 +85,8 @@ namespace toolbox::tray
 
     AppTrayIcon::AppTrayIcon(HWND app_hwnd, QIcon app_icon) : QSystemTrayIcon(nullptr)
     {
-        this->app_hwnd = app_hwnd;
-        this->app_icon = app_icon;
+        this->hwnd = app_hwnd;
+        this->icon = app_icon;
 
         // TODO error handling
         // Check if the system tray is available
@@ -108,34 +108,35 @@ namespace toolbox::tray
         menu->addAction(menu_restore);
 
         // Connect actions to slots
-        connect(menu_restore, &QAction::triggered, this, &AppTrayIcon::unhide_app_window);
+        connect(menu_restore, &QAction::triggered, this, &AppTrayIcon::unhide_window);
 
         // Set the context menu for the tray icon
         setContextMenu(menu);
+        show();
     }
 
-    void AppTrayIcon::toggle_app_window()
+    void AppTrayIcon::hide_window()
     {
-        if (IsWindowVisible(app_hwnd))
-        {
-            hide_app_window();
-        } else
-        {
-            unhide_app_window();
-        }
-    }
-
-    void AppTrayIcon::hide_app_window()
-    {
-        ShowWindow(app_hwnd, SW_HIDE);
+        ShowWindow(hwnd, SW_HIDE);
         show(); // Show tray icon
         setToolTip("App is hidden. Click to restore.");
     }
 
-    void AppTrayIcon::unhide_app_window()
+    void AppTrayIcon::unhide_window()
     {
-        ShowWindow(app_hwnd, SW_SHOW);
+        ShowWindow(hwnd, SW_SHOW);
         hide(); // Hide tray icon
+    }
+
+    void AppTrayIcon::toggle_window()
+    {
+        if (IsWindowVisible(hwnd))
+        {
+            hide_window();
+        } else
+        {
+            unhide_window();
+        }
     }
 
     AppTrayIcon *create_app_tray_icon(HWND window_handle)
@@ -148,7 +149,7 @@ namespace toolbox::tray
             app_icon = QApplication::style()->standardIcon(QStyle::SP_DesktopIcon);
         } else
         {
-            app_icon = qicon_from_exe_path(exe_path_from_hwnd(window_handle));
+            app_icon = icon_from_exe_path(exe_path_from_hwnd(window_handle));
         }
 
         return new AppTrayIcon(window_handle, app_icon);

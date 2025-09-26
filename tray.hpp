@@ -14,8 +14,6 @@ namespace toolbox::tray
     public:
         TrayIcon(QApplication *app, config::Config *config);
 
-    public slots:
-
     private slots:
         void show_config_editor();
 //        void set_volume(int value);
@@ -41,13 +39,13 @@ namespace toolbox::tray
         ~AppTrayIcon() = default;
 
     public slots:
-        void toggle_app_window();
-        void hide_app_window();
-        void unhide_app_window();
+        void hide_window();
+        void unhide_window();
+        void toggle_window();
 
     private:
-        HWND app_hwnd;
-        QIcon app_icon;
+        HWND hwnd;
+        QIcon icon;
     };
 
     AppTrayIcon* create_app_tray_icon(HWND app_hwnd);

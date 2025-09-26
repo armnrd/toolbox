@@ -1,5 +1,10 @@
 #include "workspaces.hpp"
+#include "windowmgr.hpp"
+#include "keymap.hpp"
+#include "tray.hpp"
+#include <psapi.h>
 #include <QLabel>
+#include <thread>
 #include <windows.h>
 #include <tlhelp32.h>
 
@@ -8,69 +13,26 @@ using std::map;
 using std::string;
 using std::wstring;
 
-struct App
-{
-    wstring location;
-    wstring executable;
-    wstring args;
-    wstring position;
-    wstring toggle_window;
+static std::map<std::string, std::function<void(HWND)> > windowmgr_function_map = {
+    {"centre", toolbox::windowmgr::centre},
+    {"lower_screen", toolbox::windowmgr::position_lower_screen},
+    {"upper_screen", toolbox::windowmgr::position_upper_screen},
+    {"right_middle", toolbox::windowmgr::position_right_middle},
+    {"top_right", toolbox::windowmgr::position_top_right},
+    {"top_middle", toolbox::windowmgr::position_top_middle},
+    {"top_left", toolbox::windowmgr::position_top_left},
+    {"left_middle", toolbox::windowmgr::position_left_middle},
+    {"bottom_left", toolbox::windowmgr::position_bottom_left},
+    {"bottom_middle", toolbox::windowmgr::position_bottom_middle},
+    {"bottom_right", toolbox::windowmgr::position_bottom_right},
 };
-
-static map<string, map<string, App> > spaces = {};
-
-namespace YAML
-{
-    template<>
-    struct convert<App>
-    {
-        static Node encode(const App &app)
-        {
-            // TODO: handle null values
-            Node node;
-            node["location"] = string(app.location.begin(), app.location.end());
-            node["executable"] = string(app.executable.begin(), app.executable.end());
-            node["args"] = string(app.args.begin(), app.args.end());
-            node["position"] = string(app.position.begin(), app.position.end());
-            node["toggle window"] = string(app.toggle_window.begin(), app.toggle_window.end());
-            return node;
-        }
-
-        static bool decode(const Node &node, App &app)
-        {
-            if (!node.IsMap())
-            {
-                return false;
-            }
-
-            // TODO: nullptr when empty?
-            auto location_str = node["location"].as<string>();
-            auto executable_str = node["executable"].as<string>();
-            auto args_str = node["args"].as<string>();
-            auto position_str = node["position"].as<string>();
-            auto toggle_window_str = node["toggle window"].as<string>();
-
-            app.location = wstring(location_str.begin(), location_str.end());
-            app.executable = wstring(executable_str.begin(), executable_str.end());
-            app.args = wstring(args_str.begin(), args_str.end());
-            app.position = wstring(position_str.begin(), position_str.end());
-            app.toggle_window = wstring(toggle_window_str.begin(), toggle_window_str.end());
-
-            qDebug() << format(
-                L"Decoded App: location: '{}', executable: '{}', args: '{}', position: '{}', toggle window: '{}'",
-                app.location, app.executable, app.args, app.position, app.toggle_window);
-
-            return true;
-        }
-    };
-} // namespace YAML
 
 static std::list<string> get_running_processes()
 {
     std::logic_error("Not implemented");
 }
 
-static bool is_process_running(const wstring &process_exe)
+static bool is_process_running(const wstring &exe_name)
 {
     HANDLE h_th_snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (h_th_snap == INVALID_HANDLE_VALUE)
@@ -89,7 +51,7 @@ static bool is_process_running(const wstring &process_exe)
 
     do
     {
-        if (process_exe == pe32.szExeFile)
+        if (exe_name == pe32.szExeFile)
         {
             CloseHandle(h_th_snap);
             return true;
@@ -112,7 +74,7 @@ static DWORD launch_process(const wstring &location, const wstring &executable, 
     {
         auto message = std::system_category().message(GetLastError());
         qDebug() << format(L"Failed to launch process: {}; error: {} (GetLastError: {})",
-                           executable, wstring(message.begin(), message.end()) , GetLastError());
+                           executable, wstring(message.begin(), message.end()), GetLastError());
         // TODO: handle failure
         return 0;
     }
@@ -124,58 +86,127 @@ static DWORD launch_process(const wstring &location, const wstring &executable, 
     return pid;
 }
 
-static HWND hwnd_from_pid(DWORD pid)
+static wstring exe_path_from_pid(DWORD pid)
+{
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+    if (hProcess)
+    {
+        wchar_t exePath[MAX_PATH] = {};
+        if (GetModuleFileNameExW(hProcess, nullptr, exePath, MAX_PATH))
+        {
+            CloseHandle(hProcess);
+            return exePath;
+        }
+        CloseHandle(hProcess);
+    }
+    return {};
+}
+
+static HWND hwnd_from_exe_name(const wstring &exe_name)
 {
     HWND hwnd = nullptr;
-    auto packvar = std::pair(&hwnd, pid);
+    // (address of variable hwnd, executable name)
+    auto packvar = std::make_pair(&hwnd, exe_name);
     EnumWindows(
-        [](HWND win_hwnd, LPARAM lp) -> BOOL
+        [](HWND win_hwnd, LPARAM packvar_ptr) -> BOOL
         {
-            auto pack = *(reinterpret_cast<std::pair<HWND *, DWORD> *>(lp));
-            DWORD wndPid;
-            GetWindowThreadProcessId(win_hwnd, &wndPid);
-            if (wndPid == pack.second && GetWindow(win_hwnd, GW_OWNER) == nullptr && IsWindowVisible(win_hwnd))
+            auto pack = *(reinterpret_cast<std::pair<HWND *, const wstring> *>(packvar_ptr));
+            DWORD win_pid;
+
+            // Retrieve the name of the executable that created win_hwnd
+            GetWindowThreadProcessId(win_hwnd, &win_pid);
+            auto win_exe_path = exe_path_from_pid(win_pid);
+
+            if (pack.second == win_exe_path.substr(win_exe_path.find_last_of(L"\\") + 1))
             {
-                pack.first = &win_hwnd;
-                return FALSE;
+                *(pack.first) = win_hwnd;
+                return FALSE; // Stop enumeration
             }
+
             return TRUE;
         },
         LPARAM(&packvar)
     );
-    qDebug() << format(L"Main window HWND: {}", (uintptr_t) hwnd);
+    qDebug() << format(L"HWND of window matching {}: {}", exe_name, (uintptr_t) hwnd);
 
     return hwnd;
 }
 
+void app_post_launch(HWND hwnd, const AppConfig &ac, toolbox::keymap::KeymapMgr *kmmgr)
+{
+    qDebug() << "In post launch.";
+
+    if (ac.position != "null")
+    {
+        // TODO error handling
+        windowmgr_function_map[ac.position](hwnd);
+        qDebug() << format("Positioning done: {}", ac.position);
+    }
+
+    if (ac.toggle_window != "null")
+    {
+        toolbox::tray::AppTrayIcon *tray_icon = nullptr;
+        QMetaObject::invokeMethod(QApplication::instance(), [&]() {
+            tray_icon = toolbox::tray::create_app_tray_icon(hwnd);
+            qDebug() << format(L"Created tray icon for {}.", ac.window_identifier);
+        }, Qt::BlockingQueuedConnection);
+
+        kmmgr->add_keybind(ac.toggle_window,
+                           [ac, tray_icon]()
+                           {
+                               qDebug() << format(L"Keybinding triggered for {}.", ac.window_identifier);
+                               tray_icon->toggle_window();
+                           }
+        );
+    }
+}
+
+// Waits for window matching exe_name and calls task(window HWND, ... args)
+static void winwait_then_post_launch(const AppConfig &ac, toolbox::keymap::KeymapMgr *kmmgr)
+{
+    const int MAX_ATTEMPTS = 20;
+    std::thread([ac, kmmgr]()
+    {
+        HWND hwnd = nullptr;
+        int i = 0;
+        while (!hwnd && i < MAX_ATTEMPTS)
+        {
+            Sleep(400);
+            hwnd = hwnd_from_exe_name(ac.window_identifier);
+            ++i;
+        }
+        app_post_launch(hwnd, ac, kmmgr);
+    }).detach();
+}
+
 namespace toolbox::workspaces
 {
-    void launch_terminal()
+    void WorkspaceMgr::launch_terminal()
     {
-        auto pid = launch_process(L"C:\\Users\\biswas02\\AppData\\Local\\Microsoft\\WindowsApps",
-        L"wt.exe", L"");
+        AppConfig ac;
+        for (auto pair: workspaces["base"])
+        {
+            if (pair.second.window_identifier == L"WindowsTerminal.exe")
+            {
+                ac = pair.second;
+            }
+        }
 
-        Sleep(5000);
+        launch_app(ac);
+    }
 
-        auto hwnd = hwnd_from_pid(pid);
-
-        qDebug() << format(L"Terminal window HWND: {} | IsWindow: {} | IsVisible: {}",
-                               (uintptr_t)hwnd,
-                               hwnd ? IsWindow(hwnd) : 0,
-                               hwnd ? IsWindowVisible(hwnd) : 0);
-        // position: bottom-centre
-        // toggle window: ctrl+meta+comma
-      }
-
-    WorkspaceMgr::WorkspaceMgr(QApplication *app, config::Config *config)
+    WorkspaceMgr::WorkspaceMgr(config::Config *config, keymap::KeymapMgr *kmmgr)
     {
-        auto base_workspace = map<string, App>{};
+        workspaces = {};
+        this->kmmgr = kmmgr;
+
+        auto base_workspace = map<string, AppConfig>{};
         for (auto it = (*config)["workspaces"]["base"].begin(); it != (*config)["workspaces"]["base"].end(); ++it)
         {
-            auto base_app = it->second.as<App>();
+            auto base_app = it->second.as<AppConfig>();
             base_workspace[it->first.as<string>()] = base_app;
         }
-        spaces["base"] = base_workspace;
+        workspaces["base"] = base_workspace;
     }
 
     WorkspaceMgr::~WorkspaceMgr()
@@ -185,16 +216,10 @@ namespace toolbox::workspaces
 
     void WorkspaceMgr::launch_base_apps()
     {
-        for (auto pair: spaces["base"])
+        qDebug() << "Launching base apps:";
+        for (auto pair: workspaces["base"])
         {
-            auto app = pair.second;
-            if (!is_process_running(app.executable))
-            {
-                launch_process(app.location, app.executable, app.args);
-            } else
-            {
-                qDebug() << format(L"Process already running: {}", app.executable);
-            }
+            launch_app(pair.second);
         }
     }
 
@@ -232,5 +257,24 @@ namespace toolbox::workspaces
     void WorkspaceMgr::remove_app_from_profile_list(const string &profile_name, const string &app_name)
     {
         std::logic_error("Not implemented");
+    }
+
+    void WorkspaceMgr::launch_app(const AppConfig &ac)
+    {
+        if (is_process_running(ac.executable))
+        {
+            qDebug() << format(L"{} already running.", ac.executable);
+        } else
+        {
+            launch_process(ac.location, ac.executable, ac.args);
+            qDebug() << format(L"{} launched.", ac.executable);
+
+            if (ac.position == "null" && ac.toggle_window == "null")
+            {
+                return; // Nothing else to do, return
+            }
+
+            winwait_then_post_launch(ac, kmmgr);
+        }
     }
 } // namespace toolbox::workspaces

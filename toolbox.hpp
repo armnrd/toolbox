@@ -2,7 +2,7 @@
 #define TOOLBOX_TOOLBOX_HPP
 
 #include "config.hpp"
-#include "hotkeys.hpp"
+#include "keymap.hpp"
 #include "tray.hpp"
 #include "workspaces.hpp"
 #include <QApplication>
@@ -20,8 +20,8 @@ namespace toolbox
     private:
         config::Config *config;
         tray::TrayIcon *tray_icon;
-        hotkeys::Hotkeys *hotkeys;
-        workspaces::Workspaces *workspaces;
+        keymap::KeymapMgr *kmmgr;
+        workspaces::WorkspaceMgr *wsmgr;
     };
 }
 

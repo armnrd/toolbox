@@ -13,15 +13,16 @@ namespace toolbox
         tray_icon->showMessage("Toolbox", "Running in the system tray.", QSystemTrayIcon::Information, 2000);
         qDebug() << "Created tray icon.";
 
-        // Set up hotkeys
-        hotkeys = new hotkeys::Hotkeys(this);
-        hotkeys->add_hotkeys_from_config(config);
-        qDebug() << "Registered hotkeys from config.";
+        // Set up keymap
+        kmmgr = new keymap::KeymapMgr(this);
+        kmmgr->add_keybinds_from_config(config);
+        qDebug() << "Registered keymap from config.";
 
         // Set up workspaces
-        workspaces = new workspaces::Workspaces(this, config);
-        // workspaces->launch_base_apps();
-        // qDebug() << "Set up workspaces and launched base apps.";
+        wsmgr = new workspaces::WorkspaceMgr(config, kmmgr);
+        qDebug() << "Set up workspaces and launched base apps.";
+
+        wsmgr->launch_terminal();
     };
 
     Toolbox::~Toolbox() = default;
